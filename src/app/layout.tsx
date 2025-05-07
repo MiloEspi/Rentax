@@ -26,15 +26,66 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-      <header className="bg-gradient-to-r from-red-500 to-orange-500 text-black p-4 text-center">
-       <Navigation/>
-     
-      </header>
-        {children}
-        <footer className="bg-gradient-to-r from-blue-500 to-green-500 text-black p-4 text-center">
-          <p className="text-2xl font-bold">Thank you for visiting us</p>
+        <header className="bg-gradient-to-r from-red-500 to-orange-500 text-black p-4 text-center">
+          <Navigation />
+        </header>
+        <main className="flex-grow">{children}</main>
+        <footer className="bg-gradient-to-r from-blue-500 to-green-500 text-black p-8 text-center">
+          <div className="grid grid-cols-2 gap-8">
+            {/* Redes */}
+            <div>
+              <p className="text-2xl font-bold mb-4">Redes</p>
+              <div className="space-y-2">
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xl font-medium hover:underline block"
+              >
+                Instagram
+              </a>
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xl font-medium hover:underline block"
+              >
+                Facebook
+              </a>
+              <a
+                href="https://www.tiktok.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xl font-medium hover:underline block"
+              >
+                TikTok
+              </a>
+              </div>
+            </div>
+            {/* Contacto */}
+            <div>
+              <p className="text-2xl font-bold mb-4">Contacto</p>
+              <div className="space-y-2">
+                <a
+                  href="mailto:tuemail@example.com"
+                  className="text-xl font-medium hover:underline"
+                >
+                  tuemail@example.com
+                </a>
+                <p className="text-xl font-medium">Teléfono: +123 456 789</p>
+                <a
+                  href="https://wa.me/123456789"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xl font-medium text-green-600 hover:underline"
+                >
+                  WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
         </footer>
       </body>
     </html>
