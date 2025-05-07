@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Navigation } from "./components/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+      <header className="bg-gradient-to-r from-red-500 to-orange-500 text-black p-4 text-center">
+       <Navigation/>
+     
+      </header>
         {children}
+        <footer className="bg-gradient-to-r from-blue-500 to-green-500 text-black p-4 text-center">
+          <p className="text-2xl font-bold">Thank you for visiting us</p>
+        </footer>
       </body>
     </html>
   );
