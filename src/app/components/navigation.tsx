@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 export const Navigation = () => {
     return (
@@ -12,6 +13,14 @@ export const Navigation = () => {
                 <li>
                     <Link href="/propiedades/[id]" as="/propiedades/1" className="mr-4 text-blue-500">Propiedades</Link>
                 </li>
+                <div className="ml-auto flex space-x-4">
+                    <li>
+                        <Link href="/login" className="text-blue-500">Iniciar Sesión</Link>
+                    </li>
+                    <li>
+                        <Link href="/register" className="text-blue-500">Registrar</Link>
+                    </li>
+                </div>
             </ul>
         </nav>
     );
