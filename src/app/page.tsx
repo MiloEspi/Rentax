@@ -11,13 +11,14 @@ export default function Home() {
             href="/buscador/viviendas"
             className="bg-yellow-500 hover:bg-yellow-600 text-white py-4 px-8 rounded-lg text-center transition duration-300 shadow-md"
           >
-            Garajes
+            Viviendas
+            
           </Link>
           <Link 
             href="/buscador/garajes"
             className="bg-yellow-500 hover:bg-yellow-600 text-white py-4 px-8 rounded-lg text-center transition duration-300 shadow-md"
           >
-            Viviendas
+            Garajes
           </Link>
           <Link 
             href="/buscador/locales"
