@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Rentax",
-  description: "Alquiler de propiedades online",
+  description: "Encuentra tu hogar perfecto en cualquier lugar del mundo",
 };
 
 export default function RootLayout({
@@ -26,11 +26,12 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-white text-gray-800`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-gray-50 text-gray-900`}
       >
         {/* HEADER */}
-        <header className="bg-gradient-to-r from-yellow-400 to-orange-400 shadow-md py-4 px-6">
-          <div className="max-w-6xl mx-auto">
+        <header className="bg-white shadow-md py-4 px-6">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-red-500">Rentax</h1>
             <Navigation />
           </div>
         </header>
@@ -39,55 +40,16 @@ export default function RootLayout({
         <main className="flex-grow">{children}</main>
 
         {/* FOOTER */}
-        <footer className="bg-gradient-to-r from-blue-400 to-green-400 text-white py-10 mt-12">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-6">
-            {/* Redes */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Redes</h2>
-              <ul className="space-y-2 text-lg">
+        <footer className="bg-gray-900 text-white py-10 mt-12">
+       
+          {/* Contacto */}
+          <div className="bg-gray-800 text-white py-6 mt-8">
+            <div className="max-w-7xl mx-auto px-6">
+              <h2 className="text-xl font-semibold mb-4">Contacto</h2>
+              <ul className="space-y-2 text-sm">
                 <li>
-                  <a
-                    href="https://www.instagram.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-yellow-100 transition-colors"
-                  >
-                    Instagram
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.facebook.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-yellow-100 transition-colors"
-                  >
-                    Facebook
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.tiktok.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-yellow-100 transition-colors"
-                  >
-                    TikTok
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contacto */}
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Contacto</h2>
-              <ul className="space-y-2 text-lg">
-                <li>
-                  <a
-                    href="mailto:tuemail@example.com"
-                    className="hover:text-yellow-100 transition-colors"
-                  >
-                    tuemail@example.com
+                  <a href="mailto:contacto@rentax.com" className="hover:underline">
+                    contacto@rentax.com
                   </a>
                 </li>
                 <li>Teléfono: +123 456 789</li>
@@ -96,7 +58,7 @@ export default function RootLayout({
                     href="https://wa.me/123456789"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-yellow-100 transition-colors"
+                    className="hover:underline"
                   >
                     WhatsApp
                   </a>
@@ -105,7 +67,40 @@ export default function RootLayout({
             </div>
           </div>
 
-          <div className="text-center mt-8 text-sm opacity-75">
+          {/* Redes sociales */}
+          <div className="bg-gray-800 text-white py-6 mt-4">
+            <div className="max-w-7xl mx-auto px-6 text-center">
+              <h2 className="text-xl font-semibold mb-4">Síguenos</h2>
+              <div className="flex justify-center space-x-4">
+                <a
+                  href="https://www.tiktok.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  TikTok
+                </a>
+                <a
+                  href="https://www.facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  Facebook
+                </a>
+                <a
+                  href="https://www.instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  Instagram
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-8 text-xs opacity-75">
             © {new Date().getFullYear()} Rentax. Todos los derechos reservados.
           </div>
         </footer>
