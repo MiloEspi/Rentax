@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import Buscador from '@/app/components/Buscador';
+import Buscador from '@/components/Buscador';
 
 
 const BuscadorTipo = () => {
