@@ -1,0 +1,22 @@
+# requirements.txt
+
+# Framework principal
+django>=4.2,<5.0
+
+# Django REST Framework
+djangorestframework>=3.14.0
+
+# Autenticación con JWT
+djangorestframework-simplejwt>=5.3.0
+
+# Documentación de la API (OpenAPI / Swagger)
+drf-spectacular>=0.26.4
+
+# Permitir peticiones del frontend (Next.js)
+django-cors-headers>=4.0.0
+
+# Conector de base de datos PostgreSQL
+psycopg2-binary>=2.9.0
+
+# Utilidad general (opcional)
+python-dotenv>=1.0.0  # Para manejar variables de entorno
