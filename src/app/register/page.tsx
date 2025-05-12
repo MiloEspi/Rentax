@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import axios from 'axios';
 
 export default function Register() {
     const [form, setForm] = useState({
@@ -8,7 +7,6 @@ export default function Register() {
         apellido: '',
         email: '',
         password: '',
-        edad: '',
         dni: '',
         sexo: '',
         fecha_nacimiento: ''
@@ -40,8 +38,8 @@ export default function Register() {
         if (!form.email.includes('@')) {
             return 'El correo electrónico no es válido';
         }
-        if (!form.nombre || !form.apellido || !form.dni || !form.edad || !form.sexo || !form.fecha_nacimiento) {
-            return 'Todos los campos son obligatorios';
+        if (!form.nombre || !form.apellido || !form.dni || !form.sexo || !form.fecha_nacimiento) {
+            return 'Todos los campos obligatorios deben ser completados';
         }
         const age = calculateAge(form.fecha_nacimiento);
         if (age < 18) {
@@ -65,9 +63,34 @@ export default function Register() {
         setIsSubmitting(true);
 
         try {
-            const res = await axios.post('http://localhost:8000/api/register/', form);
-            if (res.status === 201 || res.status === 200) {
+            // Transformar los datos para enviarlos en el formato esperado por el backend
+            const payload = {
+                persona: { ...form }
+            };
+
+            console.log('Datos enviados:', payload);
+            const res = await fetch('http://localhost:8000/registro/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (res.ok) {
                 setSuccess('Usuario registrado correctamente');
+                window.location.href = '/login';
+            } else {
+                const errorData = await res.json();
+                if (errorData.persona && errorData.persona.dni) {
+                    setError(errorData.persona.dni);
+                } else if (errorData.persona && errorData.persona.email) {
+                    setError(errorData.persona.email);
+
+                }
+                else {
+                    setError(errorData.message || 'Hubo un error al registrar el usuario');
+                }
             }
         } catch (err: unknown) {
             console.error(err);
@@ -87,7 +110,7 @@ export default function Register() {
 
                 <input name="nombre" value={form.nombre} onChange={handleChange} type="text" placeholder="Nombre" />
                 <input name="apellido" value={form.apellido} onChange={handleChange} type="text" placeholder="Apellido" />
-                <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="Correo electrónico" />
+                <input name="email" value={form.email} onChange={handleChange} type="text" placeholder="Correo electrónico" />
 
                 <div style={{ position: 'relative' }}>
                     <input
@@ -117,7 +140,6 @@ export default function Register() {
                     </button>
                 </div>
 
-                <input name="edad" value={form.edad} onChange={handleChange} type="number" placeholder="Edad" />
                 <input name="dni" value={form.dni} onChange={handleChange} type="text" placeholder="DNI" />
 
                 <select name="sexo" value={form.sexo} onChange={handleChange}>
