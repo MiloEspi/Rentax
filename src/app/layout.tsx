@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/navigation";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,9 @@ export default function RootLayout({
         {/* HEADER */}
         <header className="bg-white shadow-md py-4 px-6">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-red-500">Rentax</h1>
+            <Link href="/">
+              <h1 className="text-2xl font-bold text-red-500">Rentax</h1>
+            </Link>
             <Navigation />
           </div>
         </header>
