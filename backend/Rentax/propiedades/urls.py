@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PropiedadListCreateView, PoliticaListView, LocalidadListView,ViviendaCreateView, PropiedadDetailView
+from .views import PropiedadListCreateView, PoliticaListView, LocalidadListView, ViviendaCreateView, PropiedadDetailView
 urlpatterns = [
     path('propiedades/', PropiedadListCreateView.as_view(), name='propiedad-list-create'),
     path('politicas/', PoliticaListView.as_view(), name='politica-list'),

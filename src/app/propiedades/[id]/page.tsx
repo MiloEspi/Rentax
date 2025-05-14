@@ -22,8 +22,6 @@ const RENTAX_LIGHT_RED = '#ffe6e0';
 const RENTAX_GRAY = '#f5f6fa';
 const RENTAX_DARK_GRAY = '#e3e4ea';
 
-const FONT_FAMILY = `'Poppins', 'Segoe UI', 'Roboto', sans-serif`;
-
 const mockProperty: Property = {
     id: '1',
     title: 'Moderno Departamento en el Centro',
@@ -72,7 +70,6 @@ function ratingDistribution(reviews: Review[]) {
     return dist;
 }
 
-// Flecha modular
 function ArrowButton({
     direction,
     onClick,
@@ -116,7 +113,6 @@ function ArrowButton({
     );
 }
 
-// Modal para imagen grande con flechas
 function ImageModal({
     src,
     onClose,
@@ -148,7 +144,6 @@ function ImageModal({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: FONT_FAMILY,
             }}
         >
             <div style={{ position: 'relative', maxWidth: '92vw', maxHeight: '88vh' }}>
@@ -173,8 +168,6 @@ function ImageModal({
         </div>
     );
 }
-
-// ... Calendar, DateSelector, ProgressBar igual que antes, solo cambia fontFamily
 
 function Calendar({
     value,
@@ -238,7 +231,6 @@ function Calendar({
                 boxShadow: '0 4px 24px #0003',
                 padding: 18,
                 width: 270,
-                fontFamily: FONT_FAMILY,
             }}
         >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -373,7 +365,7 @@ function DateSelector({
     setOpen: (open: boolean) => void;
 }) {
     return (
-        <div style={{ position: 'relative', marginBottom: 0, fontFamily: FONT_FAMILY }}>
+        <div style={{ position: 'relative', marginBottom: 0 }}>
             <div
                 style={{
                     display: 'flex',
@@ -387,7 +379,6 @@ function DateSelector({
                     cursor: 'pointer',
                     gap: 16,
                     fontWeight: 700,
-                    fontFamily: FONT_FAMILY,
                 }}
                 onClick={() => setOpen(true)}
             >
@@ -404,12 +395,11 @@ function DateSelector({
                         marginRight: 12,
                         minWidth: 70,
                         textAlign: 'center',
-                        fontFamily: FONT_FAMILY,
                     }}
                 >
                     {label}
                 </div>
-                <div style={{ fontSize: 17, color: value ? '#222' : '#888', fontFamily: FONT_FAMILY }}>
+                <div style={{ fontSize: 17, color: value ? '#222' : '#888' }}>
                     {value
                         ? value.toLocaleDateString('es-ES', {
                               day: '2-digit',
@@ -491,400 +481,387 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
     };
 
     return (
-        <div
-            style={{
-                maxWidth: 1300,
-                margin: '40px auto',
-                fontFamily: FONT_FAMILY,
-                background: `linear-gradient(120deg, #fff 70%, ${RENTAX_LIGHT_RED} 100%)`,
-                borderRadius: 28,
-                boxShadow: '0 8px 32px #0002',
-                padding: 38,
-                border: `2.5px solid ${RENTAX_RED}`,
-            }}
-        >
-            {/* Visualizador de imágenes */}
+        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 font-sans py-10">
             <div
                 style={{
-                    background: `linear-gradient(120deg, ${RENTAX_GRAY} 60%, ${RENTAX_LIGHT_RED} 100%)`,
-                    borderRadius: 22,
-                    boxShadow: '0 2px 16px #ff572233',
-                    border: `2.5px solid ${RENTAX_LIGHT_RED}`,
-                    padding: 28,
-                    marginBottom: 32,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    maxWidth: 1300,
+                    margin: '40px auto',
+                    background: `linear-gradient(120deg, #fff 70%, ${RENTAX_LIGHT_RED} 100%)`,
+                    borderRadius: 28,
+                    boxShadow: '0 8px 32px #0002',
+                    padding: 38,
+                    border: `2.5px solid ${RENTAX_RED}`,
                 }}
             >
-                <div style={{ position: 'relative', width: '100%', maxWidth: 800, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px #e3e4ea', border: `2.5px solid ${RENTAX_DARK_GRAY}` }}>
-                    <ArrowButton direction="left" onClick={goPrev} ariaLabel="Anterior" />
-                    <img
-                        src={property.images[selectedImageIdx]}
-                        alt="Principal"
-                        style={{
-                            width: '100%',
-                            maxHeight: 420,
-                            objectFit: 'cover',
-                            borderRadius: 14,
-                            border: `3px solid ${RENTAX_RED}`,
-                            boxShadow: '0 4px 16px #ff572244',
-                            cursor: 'pointer',
-                            background: '#fff',
-                            transition: 'box-shadow 0.2s',
-                            fontFamily: FONT_FAMILY,
-                        }}
-                        onClick={() => setModalOpen(true)}
-                    />
-                    <ArrowButton direction="right" onClick={goNext} ariaLabel="Siguiente" />
-                </div>
-                {/* Grid de miniaturas */}
+                {/* Visualizador de imágenes */}
                 <div
                     style={{
-                        display: 'grid',
-                        gridTemplateColumns: `repeat(auto-fit, minmax(90px, 1fr))`,
-                        gap: 14,
-                        marginTop: 22,
-                        width: '100%',
-                        maxWidth: 800,
+                        background: `linear-gradient(120deg, ${RENTAX_GRAY} 60%, ${RENTAX_LIGHT_RED} 100%)`,
+                        borderRadius: 22,
+                        boxShadow: '0 2px 16px #ff572233',
+                        border: `2.5px solid ${RENTAX_LIGHT_RED}`,
+                        padding: 28,
+                        marginBottom: 32,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
                     }}
                 >
-                    {property.images.map((img, idx) => (
+                    <div style={{ position: 'relative', width: '100%', maxWidth: 800, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px #e3e4ea', border: `2.5px solid ${RENTAX_DARK_GRAY}` }}>
+                        <ArrowButton direction="left" onClick={goPrev} ariaLabel="Anterior" />
                         <img
-                            key={img}
-                            src={img}
-                            alt={`Foto ${idx + 1}`}
+                            src={property.images[selectedImageIdx]}
+                            alt="Principal"
                             style={{
                                 width: '100%',
-                                height: 70,
+                                maxHeight: 420,
                                 objectFit: 'cover',
-                                borderRadius: 10,
-                                border:
-                                    selectedImageIdx === idx
-                                        ? `3px solid ${RENTAX_RED}`
-                                        : `2px solid ${RENTAX_DARK_GRAY}`,
+                                borderRadius: 14,
+                                border: `3px solid ${RENTAX_RED}`,
+                                boxShadow: '0 4px 16px #ff572244',
                                 cursor: 'pointer',
-                                boxSizing: 'border-box',
-                                boxShadow:
-                                    selectedImageIdx === idx
-                                        ? '0 2px 8px #ff572233'
-                                        : '0 1px 4px #0001',
-                                transition: 'border 0.2s, box-shadow 0.2s',
                                 background: '#fff',
+                                transition: 'box-shadow 0.2s',
                             }}
-                            onClick={() => setSelectedImageIdx(idx)}
+                            onClick={() => setModalOpen(true)}
                         />
-                    ))}
-                </div>
-                {modalOpen && (
-                    <ImageModal
-                        src={property.images[selectedImageIdx]}
-                        onClose={() => setModalOpen(false)}
-                        onPrev={goPrev}
-                        onNext={goNext}
-                    />
-                )}
-            </div>
-
-            {/* Título */}
-            <h1
-                style={{
-                    fontSize: 44,
-                    fontWeight: 900,
-                    margin: '18px 0 10px',
-                    color: RENTAX_RED,
-                    letterSpacing: 1,
-                    textShadow: '0 2px 8px #ff572244',
-                    fontFamily: FONT_FAMILY,
-                }}
-            >
-                {property.title}
-            </h1>
-
-            {/* Descripción */}
-            <div
-                style={{
-                    background: `linear-gradient(120deg, #fff 80%, ${RENTAX_DARK_GRAY} 100%)`,
-                    borderRadius: 16,
-                    padding: 22,
-                    marginBottom: 28,
-                    fontSize: 22,
-                    border: `2px solid ${RENTAX_DARK_GRAY}`,
-                    boxShadow: '0 1px 8px #e3e4ea',
-                    fontFamily: FONT_FAMILY,
-                }}
-            >
-                {property.description}
-            </div>
-
-            {/* Información tipo tupla */}
-            <div
-                style={{
-                    display: 'flex',
-                    gap: 48,
-                    marginBottom: 32,
-                    fontSize: 21,
-                    background: RENTAX_GRAY,
-                    borderRadius: 16,
-                    padding: '18px 0',
-                    border: `2px solid ${RENTAX_LIGHT_RED}`,
-                    boxShadow: '0 1px 8px #ff572244',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                    fontFamily: FONT_FAMILY,
-                }}
-            >
-                <div style={{ color: RENTAX_RED }}>
-                    <strong>Ambientes:</strong> {property.ambientes}
-                </div>
-                <div style={{ color: RENTAX_RED }}>
-                    <strong>Huéspedes:</strong> {property.huespedes}
-                </div>
-                <div style={{ color: RENTAX_RED }}>
-                    <strong>Baños:</strong> {property.banios}
-                </div>
-            </div>
-
-            {/* Selectores de fechas y botón ALQUILAR */}
-            <div
-                style={{
-                    display: 'flex',
-                    gap: 32,
-                    marginBottom: 38,
-                    alignItems: 'center',
-                    background: `linear-gradient(120deg, #fff 80%, ${RENTAX_LIGHT_RED} 100%)`,
-                    borderRadius: 16,
-                    padding: 24,
-                    border: `2px solid ${RENTAX_DARK_GRAY}`,
-                    boxShadow: '0 1px 8px #e3e4ea',
-                    maxWidth: 700,
-                    fontFamily: FONT_FAMILY,
-                }}
-            >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                    <DateSelector
-                        label="Inicio"
-                        value={startDate}
-                        onChange={date => {
-                            setStartDate(date);
-                            if (endDate && date && endDate < date) setEndDate(null);
-                        }}
-                        minDate={new Date()}
-                        maxDate={endDate ? new Date(endDate.getTime() - 24 * 60 * 60 * 1000) : undefined}
-                        open={openStart}
-                        setOpen={setOpenStart}
-                    />
-                    <DateSelector
-                        label="Fin"
-                        value={endDate}
-                        onChange={date => setEndDate(date)}
-                        minDate={startDate ? new Date(startDate.getTime() + 24 * 60 * 60 * 1000) : new Date()}
-                        open={openEnd}
-                        setOpen={setOpenEnd}
-                    />
-                </div>
-                <button
-                    style={{
-                        marginLeft: 32,
-                        background: `linear-gradient(90deg, ${RENTAX_RED} 70%, #ff8a50 100%)`,
-                        color: '#fff',
-                        fontWeight: 900,
-                        fontSize: 22,
-                        border: 'none',
-                        borderRadius: 14,
-                        padding: '22px 48px',
-                        boxShadow: '0 2px 16px #ff572244',
-                        cursor: 'pointer',
-                        letterSpacing: 2,
-                        textShadow: '0 2px 8px #ff572244',
-                        transition: 'background 0.2s, box-shadow 0.2s',
-                        fontFamily: FONT_FAMILY,
-                    }}
-                >
-                    ALQUILAR
-                </button>
-            </div>
-
-            {/* Valoración y comentarios */}
-            <div
-                style={{
-                    marginTop: 32,
-                    background: `linear-gradient(120deg, #fff 60%, ${RENTAX_LIGHT_RED} 100%)`,
-                    borderRadius: 16,
-                    padding: 28,
-                    border: `2px solid ${RENTAX_DARK_GRAY}`,
-                    boxShadow: '0 1px 8px #e3e4ea',
-                    marginBottom: 24,
-                    fontFamily: FONT_FAMILY,
-                }}
-            >
-                <h2 style={{ fontSize: 26, marginBottom: 18, color: RENTAX_RED, fontWeight: 900 }}>
-                    Valoración
-                </h2>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginBottom: 18 }}>
-                    <span style={{ fontSize: 54, color: '#f5b50a', fontWeight: 900, textShadow: '0 2px 8px #ffecb366' }}>
-                        ★
-                    </span>
-                    <span style={{ fontSize: 38, fontWeight: 900, color: RENTAX_RED, marginLeft: -12 }}>
-                        {avg.toFixed(1)}
-                    </span>
-                    <span style={{ fontSize: 20, color: '#888', marginLeft: 8 }}>
-                        ({property.reviews.length} valoraciones)
-                    </span>
-                </div>
-                {/* Barras de progreso */}
-                <div style={{ marginLeft: 8 }}>
-                    {[5, 4, 3, 2, 1].map(star => (
-                        <div key={star} style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
-                            <span style={{ width: 22, fontWeight: 700, color: '#f5b50a', fontSize: 18 }}>
-                                {star} ★
-                            </span>
-                            <ProgressBar value={dist[star - 1]} max={maxVotes} color="#f5b50a" />
-                            <span style={{ fontSize: 15, color: '#888', minWidth: 24 }}>
-                                {dist[star - 1]}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-                {/* Comentarios */}
-                <div style={{ marginTop: 24 }}>
-                    {property.reviews.map((review, idx) => (
-                        <div
-                            key={idx}
-                            style={{
-                                background: RENTAX_GRAY,
-                                borderRadius: 12,
-                                padding: 16,
-                                marginBottom: 14,
-                                boxShadow: '0 1px 8px #e3e4ea',
-                                border: `1.5px solid ${RENTAX_LIGHT_RED}`,
-                                fontFamily: FONT_FAMILY,
-                            }}
-                        >
-                            <strong style={{ color: RENTAX_RED }}>{review.user}</strong> —{' '}
-                            <span style={{ color: '#f5b50a', fontWeight: 700 }}>
-                                {'★'.repeat(review.rating)}
-                            </span>
-                            <div style={{ marginTop: 4 }}>{review.comment}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Preguntas o comentarios de la gente */}
-            <div
-                style={{
-                    marginTop: 36,
-                    background: `linear-gradient(120deg, ${RENTAX_LIGHT_RED} 80%, #fff 100%)`,
-                    borderRadius: 16,
-                    padding: 28,
-                    border: `2px solid ${RENTAX_DARK_GRAY}`,
-                    boxShadow: '0 1px 8px #e3e4ea',
-                    fontFamily: FONT_FAMILY,
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
-                    <h2 style={{ fontSize: 23, color: RENTAX_RED, fontWeight: 900, margin: 0 }}>
-                        Preguntas y comentarios
-                    </h2>
-                    <button
-                        onClick={() => setShowQuestion(q => !q)}
+                        <ArrowButton direction="right" onClick={goNext} ariaLabel="Siguiente" />
+                    </div>
+                    {/* Grid de miniaturas */}
+                    <div
                         style={{
-                            marginLeft: 24,
-                            background: RENTAX_RED,
-                            color: '#fff',
-                            fontWeight: 800,
-                            fontSize: 18,
-                            border: 'none',
-                            borderRadius: 10,
-                            padding: '10px 28px',
-                            boxShadow: '0 2px 8px #ff572244',
-                            cursor: 'pointer',
-                            letterSpacing: 1,
-                            transition: 'background 0.2s, box-shadow 0.2s',
-                            fontFamily: FONT_FAMILY,
+                            display: 'grid',
+                            gridTemplateColumns: `repeat(auto-fit, minmax(90px, 1fr))`,
+                            gap: 14,
+                            marginTop: 22,
+                            width: '100%',
+                            maxWidth: 800,
                         }}
                     >
-                        Hacer pregunta o comentario
+                        {property.images.map((img, idx) => (
+                            <img
+                                key={img}
+                                src={img}
+                                alt={`Foto ${idx + 1}`}
+                                style={{
+                                    width: '100%',
+                                    height: 70,
+                                    objectFit: 'cover',
+                                    borderRadius: 10,
+                                    border:
+                                        selectedImageIdx === idx
+                                            ? `3px solid ${RENTAX_RED}`
+                                            : `2px solid ${RENTAX_DARK_GRAY}`,
+                                    cursor: 'pointer',
+                                    boxSizing: 'border-box',
+                                    boxShadow:
+                                        selectedImageIdx === idx
+                                            ? '0 2px 8px #ff572233'
+                                            : '0 1px 4px #0001',
+                                    transition: 'border 0.2s, box-shadow 0.2s',
+                                    background: '#fff',
+                                }}
+                                onClick={() => setSelectedImageIdx(idx)}
+                            />
+                        ))}
+                    </div>
+                    {modalOpen && (
+                        <ImageModal
+                            src={property.images[selectedImageIdx]}
+                            onClose={() => setModalOpen(false)}
+                            onPrev={goPrev}
+                            onNext={goNext}
+                        />
+                    )}
+                </div>
+
+                {/* Título */}
+                <h1
+                    style={{
+                        fontSize: 44,
+                        fontWeight: 900,
+                        margin: '18px 0 10px',
+                        color: RENTAX_RED,
+                        letterSpacing: 1,
+                        textShadow: '0 2px 8px #ff572244',
+                    }}
+                >
+                    {property.title}
+                </h1>
+
+                {/* Descripción */}
+                <div
+                    style={{
+                        background: `linear-gradient(120deg, #fff 80%, ${RENTAX_DARK_GRAY} 100%)`,
+                        borderRadius: 16,
+                        padding: 22,
+                        marginBottom: 28,
+                        fontSize: 22,
+                        border: `2px solid ${RENTAX_DARK_GRAY}`,
+                        boxShadow: '0 1px 8px #e3e4ea',
+                    }}
+                >
+                    {property.description}
+                </div>
+
+                {/* Información tipo tupla */}
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: 48,
+                        marginBottom: 32,
+                        fontSize: 21,
+                        background: RENTAX_GRAY,
+                        borderRadius: 16,
+                        padding: '18px 0',
+                        border: `2px solid ${RENTAX_LIGHT_RED}`,
+                        boxShadow: '0 1px 8px #ff572244',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                    }}
+                >
+                    <div style={{ color: RENTAX_RED }}>
+                        <strong>Ambientes:</strong> {property.ambientes}
+                    </div>
+                    <div style={{ color: RENTAX_RED }}>
+                        <strong>Huéspedes:</strong> {property.huespedes}
+                    </div>
+                    <div style={{ color: RENTAX_RED }}>
+                        <strong>Baños:</strong> {property.banios}
+                    </div>
+                </div>
+
+                {/* Selectores de fechas y botón ALQUILAR */}
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: 32,
+                        marginBottom: 38,
+                        alignItems: 'center',
+                        background: `linear-gradient(120deg, #fff 80%, ${RENTAX_LIGHT_RED} 100%)`,
+                        borderRadius: 16,
+                        padding: 24,
+                        border: `2px solid ${RENTAX_DARK_GRAY}`,
+                        boxShadow: '0 1px 8px #e3e4ea',
+                        maxWidth: 700,
+                    }}
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                        <DateSelector
+                            label="Inicio"
+                            value={startDate}
+                            onChange={date => {
+                                setStartDate(date);
+                                if (endDate && date && endDate < date) setEndDate(null);
+                            }}
+                            minDate={new Date()}
+                            maxDate={endDate ? new Date(endDate.getTime() - 24 * 60 * 60 * 1000) : undefined}
+                            open={openStart}
+                            setOpen={setOpenStart}
+                        />
+                        <DateSelector
+                            label="Fin"
+                            value={endDate}
+                            onChange={date => setEndDate(date)}
+                            minDate={startDate ? new Date(startDate.getTime() + 24 * 60 * 60 * 1000) : new Date()}
+                            open={openEnd}
+                            setOpen={setOpenEnd}
+                        />
+                    </div>
+                    <button
+                        style={{
+                            marginLeft: 32,
+                            background: `linear-gradient(90deg, ${RENTAX_RED} 70%, #ff8a50 100%)`,
+                            color: '#fff',
+                            fontWeight: 900,
+                            fontSize: 22,
+                            border: 'none',
+                            borderRadius: 14,
+                            padding: '22px 48px',
+                            boxShadow: '0 2px 16px #ff572244',
+                            cursor: 'pointer',
+                            letterSpacing: 2,
+                            textShadow: '0 2px 8px #ff572244',
+                            transition: 'background 0.2s, box-shadow 0.2s',
+                        }}
+                    >
+                        ALQUILAR
                     </button>
                 </div>
-                {showQuestion && (
-                    <div style={{ marginBottom: 18, display: 'flex', gap: 8 }}>
-                        <input
-                            type="text"
-                            value={questionText}
-                            onChange={e => setQuestionText(e.target.value)}
-                            placeholder="Escribe tu pregunta o comentario..."
-                            style={{
-                                flex: 1,
-                                padding: '10px 14px',
-                                borderRadius: 8,
-                                border: `1.5px solid ${RENTAX_RED}`,
-                                fontSize: 17,
-                                outline: 'none',
-                                fontFamily: FONT_FAMILY,
-                            }}
-                            onKeyDown={e => {
-                                if (e.key === 'Enter') handleAddQuestion();
-                            }}
-                        />
+
+                {/* Valoración y comentarios */}
+                <div
+                    style={{
+                        marginTop: 32,
+                        background: `linear-gradient(120deg, #fff 60%, ${RENTAX_LIGHT_RED} 100%)`,
+                        borderRadius: 16,
+                        padding: 28,
+                        border: `2px solid ${RENTAX_DARK_GRAY}`,
+                        boxShadow: '0 1px 8px #e3e4ea',
+                        marginBottom: 24,
+                    }}
+                >
+                    <h2 style={{ fontSize: 26, marginBottom: 18, color: RENTAX_RED, fontWeight: 900 }}>
+                        Valoración
+                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginBottom: 18 }}>
+                        <span style={{ fontSize: 54, color: '#f5b50a', fontWeight: 900, textShadow: '0 2px 8px #ffecb366' }}>
+                            ★
+                        </span>
+                        <span style={{ fontSize: 38, fontWeight: 900, color: RENTAX_RED, marginLeft: -12 }}>
+                            {avg.toFixed(1)}
+                        </span>
+                        <span style={{ fontSize: 20, color: '#888', marginLeft: 8 }}>
+                            ({property.reviews.length} valoraciones)
+                        </span>
+                    </div>
+                    {/* Barras de progreso */}
+                    <div style={{ marginLeft: 8 }}>
+                        {[5, 4, 3, 2, 1].map(star => (
+                            <div key={star} style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
+                                <span style={{ width: 22, fontWeight: 700, color: '#f5b50a', fontSize: 18 }}>
+                                    {star} ★
+                                </span>
+                                <ProgressBar value={dist[star - 1]} max={maxVotes} color="#f5b50a" />
+                                <span style={{ fontSize: 15, color: '#888', minWidth: 24 }}>
+                                    {dist[star - 1]}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Comentarios */}
+                    <div style={{ marginTop: 24 }}>
+                        {property.reviews.map((review, idx) => (
+                            <div
+                                key={idx}
+                                style={{
+                                    background: RENTAX_GRAY,
+                                    borderRadius: 12,
+                                    padding: 16,
+                                    marginBottom: 14,
+                                    boxShadow: '0 1px 8px #e3e4ea',
+                                    border: `1.5px solid ${RENTAX_LIGHT_RED}`,
+                                }}
+                            >
+                                <strong style={{ color: RENTAX_RED }}>{review.user}</strong> —{' '}
+                                <span style={{ color: '#f5b50a', fontWeight: 700 }}>
+                                    {'★'.repeat(review.rating)}
+                                </span>
+                                <div style={{ marginTop: 4 }}>{review.comment}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Preguntas o comentarios de la gente */}
+                <div
+                    style={{
+                        marginTop: 36,
+                        background: `linear-gradient(120deg, ${RENTAX_LIGHT_RED} 80%, #fff 100%)`,
+                        borderRadius: 16,
+                        padding: 28,
+                        border: `2px solid ${RENTAX_DARK_GRAY}`,
+                        boxShadow: '0 1px 8px #e3e4ea',
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
+                        <h2 style={{ fontSize: 23, color: RENTAX_RED, fontWeight: 900, margin: 0 }}>
+                            Preguntas y comentarios
+                        </h2>
                         <button
-                            onClick={handleAddQuestion}
+                            onClick={() => setShowQuestion(q => !q)}
                             style={{
+                                marginLeft: 24,
                                 background: RENTAX_RED,
                                 color: '#fff',
                                 fontWeight: 800,
-                                fontSize: 17,
+                                fontSize: 18,
                                 border: 'none',
-                                borderRadius: 8,
-                                padding: '10px 22px',
+                                borderRadius: 10,
+                                padding: '10px 28px',
                                 boxShadow: '0 2px 8px #ff572244',
                                 cursor: 'pointer',
                                 letterSpacing: 1,
-                                fontFamily: FONT_FAMILY,
+                                transition: 'background 0.2s, box-shadow 0.2s',
                             }}
                         >
-                            Enviar
+                            Hacer pregunta o comentario
                         </button>
                     </div>
-                )}
-                <div>
-                    {questions.map((q, idx) => (
-                        <div key={idx} style={{ marginBottom: 12 }}>
-                            <div
+                    {showQuestion && (
+                        <div style={{ marginBottom: 18, display: 'flex', gap: 8 }}>
+                            <input
+                                type="text"
+                                value={questionText}
+                                onChange={e => setQuestionText(e.target.value)}
+                                placeholder="Escribe tu pregunta o comentario..."
                                 style={{
-                                    background: '#fff',
-                                    borderRadius: 10,
-                                    padding: 14,
-                                    boxShadow: '0 1px 6px #e3e4ea',
-                                    border: `1.5px solid ${RENTAX_LIGHT_RED}`,
-                                    marginLeft: 0,
-                                    marginBottom: q.response ? 6 : 0,
-                                    fontFamily: FONT_FAMILY,
+                                    flex: 1,
+                                    padding: '10px 14px',
+                                    borderRadius: 8,
+                                    border: `1.5px solid ${RENTAX_RED}`,
+                                    fontSize: 17,
+                                    outline: 'none',
+                                }}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter') handleAddQuestion();
+                                }}
+                            />
+                            <button
+                                onClick={handleAddQuestion}
+                                style={{
+                                    background: RENTAX_RED,
+                                    color: '#fff',
+                                    fontWeight: 800,
+                                    fontSize: 17,
+                                    border: 'none',
+                                    borderRadius: 8,
+                                    padding: '10px 22px',
+                                    boxShadow: '0 2px 8px #ff572244',
+                                    cursor: 'pointer',
+                                    letterSpacing: 1,
                                 }}
                             >
-                                <strong style={{ color: RENTAX_RED }}>{q.user}</strong>:{' '}
-                                <span>{q.question}</span>
-                            </div>
-                            {q.response && (
+                                Enviar
+                            </button>
+                        </div>
+                    )}
+                    <div>
+                        {questions.map((q, idx) => (
+                            <div key={idx} style={{ marginBottom: 12 }}>
                                 <div
                                     style={{
-                                        background: RENTAX_GRAY,
+                                        background: '#fff',
                                         borderRadius: 10,
                                         padding: 14,
                                         boxShadow: '0 1px 6px #e3e4ea',
                                         border: `1.5px solid ${RENTAX_LIGHT_RED}`,
-                                        marginLeft: 38,
-                                        marginTop: 2,
-                                        fontFamily: FONT_FAMILY,
+                                        marginLeft: 0,
+                                        marginBottom: q.response ? 6 : 0,
                                     }}
                                 >
-                                    <strong style={{ color: '#007a4d' }}>Propietario</strong>:{' '}
-                                    <span>{q.response}</span>
+                                    <strong style={{ color: RENTAX_RED }}>{q.user}</strong>:{' '}
+                                    <span>{q.question}</span>
                                 </div>
-                            )}
-                        </div>
-                    ))}
+                                {q.response && (
+                                    <div
+                                        style={{
+                                            background: RENTAX_GRAY,
+                                            borderRadius: 10,
+                                            padding: 14,
+                                            boxShadow: '0 1px 6px #e3e4ea',
+                                            border: `1.5px solid ${RENTAX_LIGHT_RED}`,
+                                            marginLeft: 38,
+                                            marginTop: 2,
+                                        }}
+                                    >
+                                        <strong style={{ color: '#007a4d' }}>Propietario</strong>:{' '}
+                                        <span>{q.response}</span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

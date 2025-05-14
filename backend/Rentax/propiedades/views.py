@@ -6,6 +6,7 @@ from .serializers import PropiedadSerializer, PoliticaSerializer, LocalidadSeria
 from rest_framework import generics
 
  
+
 class PropiedadDetailView(generics.RetrieveAPIView):
     queryset = Propiedad.objects.all()
     serializer_class = PropiedadSerializer
