@@ -31,5 +31,15 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
 
+
 volumes:
   postgres_data:
+
+frontend:
+  build:
+    context: ../frontend
+    dockerfile: Dockerfile
+  ports:
+    - "3000:3000"
+  depends_on:
+    - web
