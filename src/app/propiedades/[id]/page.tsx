@@ -81,7 +81,7 @@ function ArrowButton({
     ariaLabel,
 }: {
     direction: 'left' | 'right';
-    onClick: () => void;
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
     style?: React.CSSProperties;
     size?: number;
     ariaLabel?: string;
