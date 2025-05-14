@@ -3,6 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from .models import Propiedad, Politica_De_Cancelacion, Localidad
 from .serializers import PropiedadSerializer, PoliticaSerializer, LocalidadSerializer
+from rest_framework import generics
+
+ 
+class PropiedadDetailView(generics.RetrieveAPIView):
+    queryset = Propiedad.objects.all()
+    serializer_class = PropiedadSerializer
  
 class ViviendaCreateView(APIView):
     def post(self, request):
