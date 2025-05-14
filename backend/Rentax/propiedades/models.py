@@ -8,7 +8,13 @@ class Localidad(models.Model):
 class Politica_De_Cancelacion(models.Model):
     politica=models.CharField(max_length=20)
     def _str_(self):
-        return self.nombre    
+        return self.politica   
+class PoliticaSinReembolso(models.Model):
+    politica=models.OneToOneField(Politica_De_Cancelacion, on_delete=models.CASCADE)
+class PoliticaConReembolsoCompleto(models.Model): 
+    politica=models.OneToOneField(Politica_De_Cancelacion, on_delete=models.CASCADE) 
+class PoliticaConReembolsoParcial(models.Model):
+    politica=models.OneToOneField(Politica_De_Cancelacion, on_delete=models.CASCADE)
 class Propiedad(models.Model):
     titulo = models.TextField(max_length=400)
     direccion = models.ForeignKey(Direccion, on_delete=models.CASCADE)
@@ -27,4 +33,4 @@ class Vivienda(Propiedad):
     cantidadDiasMinimo = models.IntegerField(null=True)
     baños= models.IntegerField(null=True)
 class LocalComercial(Propiedad):
-     caracteristicas=models.TextField(max_length=200)   
+    caracteristicas=models.TextField(max_length=200)   
