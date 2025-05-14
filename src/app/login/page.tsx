@@ -24,14 +24,15 @@ export default function Login() {
 
             if (response.ok) {
                 const data = await response.json();
-                // Assuming the backend returns a success flag or token
                 if (data.success) {
+                    // Redirigir al home si las credenciales son válidas
                     router.push('/home');
                 } else {
-                    setError('Credenciales incorrectas');
+                    setError(data.error || 'Credenciales incorrectas');
                 }
             } else {
-                setError('Error al iniciar sesión');
+                const errorData = await response.json();
+                setError(errorData.error || 'Error al iniciar sesión');
             }
         } catch (err) {
             setError('Error de conexión con el servidor');
@@ -61,7 +62,7 @@ export default function Login() {
                     <div style={{ marginBottom: '15px', textAlign: 'left' }}>
                         <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#000' }}>Email</label>
                         <input
-                            type="email"
+                            type="text"
                             placeholder="Acá va tu mail"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -70,14 +71,18 @@ export default function Login() {
                                 padding: '10px',
                                 borderRadius: '4px',
                                 border: '1px solid #ccc',
-                                fontSize: '16px'
+                                fontSize: '16px',
+                                color: '#333',
+                                backgroundColor: '#f9f9f9',
                             }}
+                            onFocus={(e) => e.target.style.backgroundColor = '#e0e0e0'}
+                            onBlur={(e) => e.target.style.backgroundColor = '#f9f9f9'}
                         />
                     </div>
                     <div style={{ marginBottom: '15px', textAlign: 'left' }}>
                         <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#000' }}>Contraseña</label>
                         <input
-                            type="password"
+                            type="text"
                             placeholder="Acá va tu contraseña"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -86,8 +91,12 @@ export default function Login() {
                                 padding: '10px',
                                 borderRadius: '4px',
                                 border: '1px solid #ccc',
-                                fontSize: '16px'
+                                fontSize: '16px',
+                                color: '#333',
+                                backgroundColor: '#f9f9f9',
                             }}
+                            onFocus={(e) => e.target.style.backgroundColor = '#e0e0e0'}
+                            onBlur={(e) => e.target.style.backgroundColor = '#f9f9f9'}
                         />
                     </div>
                     {error && <p style={{ color: 'red', marginBottom: '15px' }}>{error}</p>}
@@ -106,9 +115,8 @@ export default function Login() {
                     >
                         Iniciar Sesión
                     </button>
-                        </form>
-                    </div>
-                </div>
-
+                </form>
+            </div>
+        </div>
     );
 }
