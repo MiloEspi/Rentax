@@ -16,7 +16,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
         persona_data = data.get('persona', {})
         dni = persona_data.get('dni')
         email = persona_data.get('email')
-
         if dni and Persona.objects.filter(dni=dni).exists():
             raise serializers.ValidationError({"persona": {"dni": "Ya existe un usuario con ese DNI."}})
         if email and Persona.objects.filter(email=email).exists():
