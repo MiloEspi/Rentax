@@ -21,4 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('propiedades.urls')),
     path('',include('usuarios.urls')),
+    path('', include('accounts.urls')),  # Asegurate de importar las rutas de la app
+
 ]

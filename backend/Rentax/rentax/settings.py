@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'propiedades',
     'usuarios',
     'alquileres',
-    'corsheaders'
+    'corsheaders',
+    'accounts'
 ]
 
 MIDDLEWARE = [
@@ -140,4 +141,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',  # ruta correcta a tu backend personalizado
 ]

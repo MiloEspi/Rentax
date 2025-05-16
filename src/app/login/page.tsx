@@ -1,6 +1,43 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const router = useRouter();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+
+        try {
+            const response = await fetch('http://localhost:8000/login/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                router.push('/home');
+            } else {
+                setError(data.error || 'Credenciales incorrectas');
+            }
+            }
+             catch (err: unknown) {
+                if (err instanceof Error) {
+                    setError('Error de conexión con el servidor: ' + err.message);
+                } else {
+                    setError('Error de conexión con el servidor');
+                }
+        }
+
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -16,36 +53,52 @@ export default function Login() {
                 backgroundColor: '#fff',
                 borderRadius: '8px',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                textAlign: 'center'
+                textAlign: 'center',
+                border: '2px solid #ff0000'
             }}>
-                <h1>Alquilar Express</h1>
-                <form>
-                    <div style={{ marginBottom: '15px' }}>
+                <h1 style={{ fontSize: '2rem', marginBottom: '20px', color: '#000' }}>Iniciar Sesión</h1>
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '15px', textAlign: 'left' }}>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#000' }}>Email</label>
                         <input
-                            type="email"
+                            type="text"
                             placeholder="Acá va tu mail"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             style={{
                                 width: '100%',
                                 padding: '10px',
                                 borderRadius: '4px',
                                 border: '1px solid #ccc',
-                                fontSize: '16px'
+                                fontSize: '16px',
+                                color: '#333',
+                                backgroundColor: '#f9f9f9',
                             }}
+                            onFocus={(e) => e.target.style.backgroundColor = '#e0e0e0'}
+                            onBlur={(e) => e.target.style.backgroundColor = '#f9f9f9'}
                         />
                     </div>
-                    <div style={{ marginBottom: '15px' }}>
+                    <div style={{ marginBottom: '15px', textAlign: 'left' }}>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#000' }}>Contraseña</label>
                         <input
                             type="password"
                             placeholder="Acá va tu contraseña"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             style={{
                                 width: '100%',
                                 padding: '10px',
                                 borderRadius: '4px',
                                 border: '1px solid #ccc',
-                                fontSize: '16px'
+                                fontSize: '16px',
+                                color: '#333',
+                                backgroundColor: '#f9f9f9',
                             }}
+                            onFocus={(e) => e.target.style.backgroundColor = '#e0e0e0'}
+                            onBlur={(e) => e.target.style.backgroundColor = '#f9f9f9'}
                         />
                     </div>
+                    {error && <p style={{ color: 'red', marginBottom: '15px' }}>{error}</p>}
                     <button
                         type="submit"
                         style={{
