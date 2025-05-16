@@ -1,34 +1,23 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import Buscador from '@/components/Buscador';
+import { useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 
-
-const BuscadorTipo = () => {
-  const params = useParams();
-  const tipo = params.tipo as string;
-
-  const nombre = {
-    viviendas: 'Viviendas',
-    garajes: 'Garajes',
-    locales: 'Locales Comerciales',
-  }[tipo] || 'Propiedades';
-
-  return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-4 text-yellow-500">
-        Buscador de {nombre}
-      </h1>
-
-      {/* 🔍 Buscador */}
-      <Buscador tipo={tipo} />
-
-      {/* Aquí irán los resultados */}
-      <p className="text-lg text-gray-600">
-        Resultados disponibles próximamente para `{nombre}`.
-      </p>
-    </div>
-  );
+const tipoMap: Record<string, string> = {
+  viviendas: 'vivienda',
+  garajes: 'cochera',
+  locales: 'local',
 };
 
-export default BuscadorTipo;
+export default function RedirectBuscadorTipo() {
+  const params = useParams();
+  const router = useRouter();
+  const tipo = params.tipo as string;
+  const tipoProp = tipoMap[tipo] || 'vivienda';
+
+  useEffect(() => {
+    router.replace(`/BuscarPropiedades?tipo=${tipoProp}`);
+  }, [router, tipoProp]);
+
+  return null;
+}

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const SERVICIOS = [
   { label: 'WiFi', value: 'wifi' },
@@ -15,6 +16,269 @@ const TIPOS_PROPIEDAD = [
   { label: 'Local', value: 'local' },
   { label: 'Cochera', value: 'cochera' },
 ];
+
+// Colores para el calendario
+const RENTAX_RED = '#ff5a1f';
+const RENTAX_LIGHT_RED = '#ffe7db';
+
+/**
+ * Calendar component
+ * minDate y maxDate son opcionales, pero si se pasan, se usan para deshabilitar días.
+ */
+function Calendar({
+  value,
+  onChange,
+  onClose,
+  minDate,
+  maxDate,
+}: {
+  value: Date | null;
+  onChange: (date: Date) => void;
+  onClose: () => void;
+  minDate?: Date;
+  maxDate?: Date;
+}) {
+  const [current, setCurrent] = React.useState(() => {
+    const d = value || new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
+
+  React.useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (!(e.target as HTMLElement).closest('.calendar-popup')) {
+        onClose();
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [onClose]);
+
+  const daysInMonth = (year: number, month: number) =>
+    new Date(year, month + 1, 0).getDate();
+
+  const handleSelect = (day: number) => {
+    const date = new Date(current.getFullYear(), current.getMonth(), day);
+    if (
+      (minDate && date < minDate) ||
+      (maxDate && date > maxDate)
+    ) return;
+    onChange(date);
+    onClose();
+  };
+
+  const days = [];
+  const firstDay = new Date(current.getFullYear(), current.getMonth(), 1).getDay();
+  for (let i = 0; i < firstDay; i++) days.push(null);
+  for (let d = 1; d <= daysInMonth(current.getFullYear(), current.getMonth()); d++) {
+    days.push(d);
+  }
+
+  return (
+    <div
+      className="calendar-popup"
+      style={{
+        position: 'absolute',
+        top: 48,
+        left: 0,
+        zIndex: 10,
+        background: '#fff',
+        border: `2px solid ${RENTAX_RED}`,
+        borderRadius: 12,
+        boxShadow: '0 4px 24px #0003',
+        padding: 18,
+        width: 270,
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <button
+          onClick={() =>
+            setCurrent(
+              new Date(current.getFullYear(), current.getMonth() - 1, 1)
+            )
+          }
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: 22,
+            cursor: 'pointer',
+            color: RENTAX_RED,
+            fontWeight: 700,
+          }}
+        >
+          ‹
+        </button>
+        <span style={{ fontWeight: 700, color: RENTAX_RED }}>
+          {current.toLocaleString('es-ES', {
+            month: 'long',
+            year: 'numeric',
+          })}
+        </span>
+        <button
+          onClick={() =>
+            setCurrent(
+              new Date(current.getFullYear(), current.getMonth() + 1, 1)
+            )
+          }
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: 22,
+            cursor: 'pointer',
+            color: RENTAX_RED,
+            fontWeight: 700,
+          }}
+        >
+          ›
+        </button>
+      </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: 4,
+          marginBottom: 4,
+          fontSize: 15,
+          color: RENTAX_RED,
+          fontWeight: 700,
+          letterSpacing: 1,
+        }}
+      >
+        {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d) => (
+          <div key={d} style={{ textAlign: 'center' }}>
+            {d}
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: 4,
+        }}
+      >
+        {days.map((d, i) =>
+          d ? (
+            <button
+              key={i}
+              onClick={() => handleSelect(d)}
+              disabled={
+                (minDate && new Date(current.getFullYear(), current.getMonth(), d) < minDate) ||
+                (maxDate && new Date(current.getFullYear(), current.getMonth(), d) > maxDate)
+              }
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                border: value &&
+                  value.getDate() === d &&
+                  value.getMonth() === current.getMonth() &&
+                  value.getFullYear() === current.getFullYear()
+                  ? `2.5px solid ${RENTAX_RED}`
+                  : '1.5px solid #e0e0e0',
+                background:
+                  value &&
+                  value.getDate() === d &&
+                  value.getMonth() === current.getMonth() &&
+                  value.getFullYear() === current.getFullYear()
+                    ? RENTAX_LIGHT_RED
+                    : '#fafafa',
+                color: '#222',
+                cursor: 'pointer',
+                fontWeight: 600,
+                opacity:
+                  (minDate && new Date(current.getFullYear(), current.getMonth(), d) < minDate) ||
+                  (maxDate && new Date(current.getFullYear(), current.getMonth(), d) > maxDate)
+                    ? 0.4
+                    : 1,
+              }}
+            >
+              {d}
+            </button>
+          ) : (
+            <div key={i} />
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+// DateSelector component
+function DateSelector({
+  label,
+  value,
+  onChange,
+  minDate,
+  maxDate,
+  open,
+  setOpen,
+}: {
+  label: string;
+  value: Date | null;
+  onChange: (date: Date) => void;
+  minDate?: Date;
+  maxDate?: Date;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
+  return (
+    <div style={{ position: 'relative', marginBottom: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          background: `linear-gradient(135deg, #fff 60%, ${RENTAX_LIGHT_RED} 100%)`,
+          border: `2.5px solid ${RENTAX_RED}`,
+          borderRadius: 12,
+          padding: '14px 18px',
+          boxShadow: '0 2px 8px #0001',
+          minWidth: 220,
+          cursor: 'pointer',
+          gap: 16,
+          fontWeight: 700,
+        }}
+        onClick={() => setOpen(true)}
+      >
+        <div
+          style={{
+            background: RENTAX_RED,
+            color: '#fff',
+            borderRadius: 8,
+            padding: '8px 18px',
+            fontWeight: 800,
+            fontSize: 16,
+            letterSpacing: 1,
+            boxShadow: '0 1px 4px #0002',
+            marginRight: 12,
+            minWidth: 70,
+            textAlign: 'center',
+          }}
+        >
+          {label}
+        </div>
+        <div style={{ fontSize: 17, color: value ? '#222' : '#888' }}>
+          {value
+            ? value.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              })
+            : `Seleccionar fecha`}
+        </div>
+        <span style={{ marginLeft: 'auto', color: RENTAX_RED, fontSize: 20 }}>📅</span>
+      </div>
+      {open && (
+        <Calendar
+          value={value}
+          onChange={onChange}
+          onClose={() => setOpen(false)}
+          minDate={minDate}
+          maxDate={maxDate}
+        />
+      )}
+    </div>
+  );
+}
 
 export default function BuscarPropiedades() {
   const [tipoPropiedad, setTipoPropiedad] = useState<'vivienda' | 'local' | 'cochera'>('vivienda');
@@ -33,6 +297,35 @@ export default function BuscarPropiedades() {
   const [huespedes, setHuespedes] = useState(1);
   const [ambientes, setAmbientes] = useState(1);
   const [banios, setBanios] = useState(1);
+
+  // Fechas
+  const [fechaDesde, setFechaDesde] = useState<Date | null>(null);
+  const [fechaHasta, setFechaHasta] = useState<Date | null>(null);
+  const [openDesde, setOpenDesde] = useState(false);
+  const [openHasta, setOpenHasta] = useState(false);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Estado para evitar sobrescribir el tipo después del primer render
+  const [initialized, setInitialized] = useState(false);
+  // Setear tipoPropiedad desde la query string SOLO al montar el componente o cuando cambia el parámetro
+  useEffect(() => {
+    if (!initialized) {
+      const tipoParam = searchParams.get('tipo');
+      if (tipoParam === 'vivienda' || tipoParam === 'local' || tipoParam === 'cochera') {
+        setTipoPropiedad(tipoParam);
+      }
+      setInitialized(true);
+    }
+    // eslint-disable-next-line
+  }, [searchParams, initialized]);
+
+  // Cuando el usuario cambia el tipo desde los botones, actualizar la URL y el estado
+  const handleTipoPropiedad = (tipo: 'vivienda' | 'local' | 'cochera') => {
+    setTipoPropiedad(tipo);
+    router.replace(`/BuscarPropiedades?tipo=${tipo}`);
+  };
 
   // Autocompletado de ciudad
   useEffect(() => {
@@ -82,6 +375,14 @@ export default function BuscarPropiedades() {
     }
   };
 
+  // Cambiar el orden y label de TIPOS_PROPIEDAD
+  // (esto debe ir arriba, pero lo dejamos aquí para claridad)
+  // TIPOS_PROPIEDAD = [
+  //   { label: 'Vivienda', value: 'vivienda' },
+  //   { label: 'Cochera', value: 'cochera' },
+  //   { label: 'Local Comercial', value: 'local' },
+  // ];
+
   const handleBuscar = () => {
     setShowResultados(true);
     // Simulación de filtrado por tipoPropiedad
@@ -104,6 +405,8 @@ export default function BuscarPropiedades() {
     setAmbientes(1);
     setBanios(1);
     setTipoPropiedad('vivienda');
+    setFechaDesde(null);
+    setFechaHasta(null);
   };
 
   // For dragging thumbs (precio)
@@ -195,7 +498,7 @@ export default function BuscarPropiedades() {
                   ? 'bg-orange-500 text-white border-orange-500 shadow'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-orange-100'}
               `}
-              onClick={() => setTipoPropiedad(tp.value as any)}
+              onClick={() => handleTipoPropiedad(tp.value as any)}
               type="button"
             >
               {tp.label}
@@ -306,6 +609,30 @@ export default function BuscarPropiedades() {
               <span>$500</span>
             </div>
           </div>
+        </section>
+
+        {/* RECUADRO GRIS DE FECHAS */}
+        <section className="bg-gray-200 rounded-2xl shadow p-8 mb-8 flex flex-col md:flex-row gap-8 items-center justify-center">
+          <DateSelector
+            label="Desde"
+            value={fechaDesde}
+            onChange={date => {
+              setFechaDesde(date);
+              if (fechaHasta && date && fechaHasta < date) setFechaHasta(null);
+            }}
+            open={openDesde}
+            setOpen={setOpenDesde}
+            minDate={new Date()}
+            maxDate={fechaHasta || undefined}
+          />
+          <DateSelector
+            label="Hasta"
+            value={fechaHasta}
+            onChange={date => setFechaHasta(date)}
+            open={openHasta}
+            setOpen={setOpenHasta}
+            minDate={fechaDesde || new Date()}
+          />
         </section>
 
         {/* Vivienda: Bloque de huéspedes, ambientes y baños */}
