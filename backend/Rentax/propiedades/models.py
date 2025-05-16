@@ -25,12 +25,22 @@ class Propiedad(models.Model):
     localidad=models.ForeignKey(Localidad,on_delete=models.CASCADE, null=True)
     def __str__(self):
         return self.titulo 
+
+class FotoPropiedad(models.Model):
+    propiedad = models.ForeignKey(Propiedad, on_delete=models.CASCADE, related_name='fotos')
+    imagen = models.ImageField(upload_to='propiedades/')
+    descripcion = models.CharField(max_length=200, blank=True)
+
 class Cochera(Propiedad):
     cupo_de_autos=models.IntegerField()
 class Vivienda(Propiedad):
-    caracteristicas=models.TextField(max_length=200) 
+    caracteristicas = models.TextField(max_length=200) 
     huespedes = models.IntegerField(null=True)
     cantidadDiasMinimo = models.IntegerField(null=True)
-    baños= models.IntegerField(null=True)
+    baños = models.IntegerField(null=True)
+    # Nuevos campos
+    atributos = models.JSONField(default=list, blank=True)  # Ej: ["wifi", "pileta"]
+    # Las fotos se relacionan por el modelo FotoPropiedad
 class LocalComercial(Propiedad):
-    caracteristicas=models.TextField(max_length=200)   
+    caracteristicas = models.TextField(max_length=200)
+    metros_cuadrados = models.IntegerField(null=True, blank=True)
