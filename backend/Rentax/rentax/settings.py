@@ -144,6 +144,5 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'accounts.backends.EmailBackend',  # Backend personalizado para correos
-    'django.contrib.auth.backends.ModelBackend',  # Backend predeterminado
+    'accounts.backends.EmailBackend',  # ruta correcta a tu backend personalizado
 ]

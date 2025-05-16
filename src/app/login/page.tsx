@@ -16,27 +16,26 @@ export default function Login() {
         try {
             const response = await fetch('http://localhost:8000/login/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success) {
-                    // Redirigir al home si las credenciales son válidas
-                    router.push('/home');
-                } else {
-                    setError(data.error || 'Credenciales incorrectas');
-                }
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                router.push('/home');
             } else {
-                const errorData = await response.json();
-                setError(errorData.error || 'Error al iniciar sesión');
+                setError(data.error || 'Credenciales incorrectas');
             }
-        } catch (err) {
-            setError('Error de conexión con el servidor');
+            }
+             catch (err: unknown) {
+                if (err instanceof Error) {
+                    setError('Error de conexión con el servidor: ' + err.message);
+                } else {
+                    setError('Error de conexión con el servidor');
+                }
         }
+
     };
 
     return (
@@ -82,7 +81,7 @@ export default function Login() {
                     <div style={{ marginBottom: '15px', textAlign: 'left' }}>
                         <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#000' }}>Contraseña</label>
                         <input
-                            type="text"
+                            type="password"
                             placeholder="Acá va tu contraseña"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
