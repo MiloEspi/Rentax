@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Register() {
     const [form, setForm] = useState({
@@ -15,6 +16,14 @@ export default function Register() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+    const router = useRouter();
+
+     useEffect(() => {
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            router.replace('/');
+        }
+    }, [router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,8 +39,6 @@ export default function Register() {
         }
         return age;
     };
-
-    const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
     const validateForm = () => {
         // Validar campos obligatorios

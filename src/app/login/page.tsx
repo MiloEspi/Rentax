@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
@@ -8,6 +8,13 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+
+    // Redirige al home si ya está logueado
+    useEffect(() => {
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            router.replace('/');
+        }
+    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,19 +30,22 @@ export default function Login() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                router.push('/home');
+                localStorage.setItem('isLoggedIn', 'true');
+                window.location.href = '/';
+            } else if (data.is_admin) {
+                localStorage.setItem('adminEmail', email);
+                window.location.href = '/verificacionAdmin';
             } else {
                 setError(data.error || 'Credenciales incorrectas');
             }
-            }
-             catch (err: unknown) {
-                if (err instanceof Error) {
-                    setError('Error de conexión con el servidor: ' + err.message);
-                } else {
-                    setError('Error de conexión con el servidor');
-                }
         }
-
+        catch (err: unknown) {
+            if (err instanceof Error) {
+                setError('Error de conexión con el servidor: ' + err.message);
+            } else {
+                setError('Error de conexión con el servidor');
+            }
+        }
     };
 
     return (
@@ -54,7 +64,7 @@ export default function Login() {
                 borderRadius: '8px',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                 textAlign: 'center',
-                border: '2px solid #ff0000'
+                border: error ? '2px solid #ff0000' : 'none'
             }}>
                 <h1 style={{ fontSize: '2rem', marginBottom: '20px', color: '#000' }}>Iniciar Sesión</h1>
                 <form onSubmit={handleSubmit}>

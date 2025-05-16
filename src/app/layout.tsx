@@ -44,7 +44,6 @@ export default function RootLayout({
 
         {/* FOOTER */}
         <footer className="bg-gray-900 text-white py-10 mt-12">
-       
           {/* Contacto */}
           <div className="bg-gray-800 text-white py-6 mt-8">
             <div className="max-w-7xl mx-auto px-6">

@@ -23,7 +23,15 @@ export default function BuscarPropiedades() {
   const [selectedCity, setSelectedCity] = useState('');
   const [precio, setPrecio] = useState<[number, number]>([30, 500]);
   const [metros, setMetros] = useState<[number, number]>([10, 500]);
-  const [resultados, setResultados] = useState<any[]>([]);
+  type Resultado = {
+    id: number;
+    titulo: string;
+    ciudad: string;
+    precio: number;
+    foto: string;
+    tipo: 'vivienda' | 'local' | 'cochera';
+  };
+  const [resultados, setResultados] = useState<Resultado[]>([]);
   const [showResultados, setShowResultados] = useState(false);
 
   // Servicios seleccionados
@@ -42,7 +50,7 @@ export default function BuscarPropiedades() {
     }
     fetch(`http://localhost:8000/api/localidades/?q=${encodeURIComponent(ciudadInput)}`)
       .then(res => res.json())
-      .then(data => setCiudadFiltrada(data.map((c: any) => c.nombre)))
+      .then(data => setCiudadFiltrada(data.map((c: { nombre: string }) => c.nombre)))
       .catch(() => setCiudadFiltrada([]));
   }, [ciudadInput]);
 
@@ -195,7 +203,7 @@ export default function BuscarPropiedades() {
                   ? 'bg-orange-500 text-white border-orange-500 shadow'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-orange-100'}
               `}
-              onClick={() => setTipoPropiedad(tp.value as any)}
+              onClick={() => setTipoPropiedad(tp.value as 'vivienda' | 'local' | 'cochera')}
               type="button"
             >
               {tp.label}
