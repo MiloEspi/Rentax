@@ -42,4 +42,5 @@ class Vivienda(Propiedad):
     atributos = models.JSONField(default=list, blank=True)  # Ej: ["wifi", "pileta"]
     # Las fotos se relacionan por el modelo FotoPropiedad
 class LocalComercial(Propiedad):
-    caracteristicas=models.TextField(max_length=200)
+    caracteristicas = models.TextField(max_length=200)
+    metros_cuadrados = models.IntegerField(null=True, blank=True)

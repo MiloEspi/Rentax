@@ -32,11 +32,15 @@ export default function CargarPropiedad() {
     titulo: '',
     descripcion: '',
     ciudad: '',
-    direccion: '',
+    direccion_calle: '',
+    direccion_numero: '',
+    direccion_piso: '',
+    direccion_departamento: '',
     politica: '',
     ambientes: 1,
     huespedes: 1,
     banios: 1,
+    metros_cuadrados: '',
     precio: '',
     diasMin: '',
     atributos: [] as string[],
@@ -85,9 +89,15 @@ export default function CargarPropiedad() {
     if (!form.titulo) return 'Debe ingresar el título de la propiedad.';
     if (!form.descripcion) return 'Debe ingresar la descripción.';
     if (!form.ciudad) return 'Debe seleccionar la ciudad.';
-    if (!form.direccion) return 'Debe ingresar la dirección.';
-    if (!form.ambientes || !form.huespedes || !form.banios)
-      return 'Debe indicar ambientes, huéspedes y baños.';
+    if (!form.direccion_calle) return 'Debe ingresar la calle.';
+    if (!form.direccion_numero) return 'Debe ingresar el número.';
+    if (form.categoria === 'vivienda') {
+      if (!form.ambientes || !form.huespedes || !form.banios)
+        return 'Debe indicar ambientes, huéspedes y baños.';
+    }
+    if (form.categoria === 'local') {
+      if (!form.metros_cuadrados) return 'Debe indicar los metros cuadrados.';
+    }
     if (!form.precio) return 'Debe indicar el precio por día.';
     if (!form.diasMin) return 'Debe seleccionar la cantidad mínima de días.';
     if (!form.politica) return 'Debe seleccionar la política de cancelación.';
@@ -126,38 +136,57 @@ export default function CargarPropiedad() {
       return;
     }
 
-    // Armar JSON para el backend
-    const payload: any = {
+    // Armar JSON para el backend según tipo
+    let payload: any = {
       titulo: form.titulo,
       descripcion: form.descripcion,
-      ambientes: form.ambientes,
-      huespedes: form.huespedes,
-      baños: form.banios,
       precio: form.precio,
       cantidadDiasMinimo: form.diasMin,
-      caracteristicas: form.atributos.join(', '),
-      atributos: form.atributos,
       politica: form.politica,
-      // Relacionar ciudad y direccion
       localidad: form.ciudad,
       direccion: {
-        calle: form.direccion,
-        numero: 0, // Ajustar según tu modelo
+        calle: form.direccion_calle,
+        numero: form.direccion_numero,
+        piso: form.direccion_piso || null,
+        departamento: form.direccion_departamento || null,
       },
     };
 
-    // Enviar fotos como FormData si el backend lo requiere, aquí solo simula
-    // Si tu backend espera multipart/form-data, deberías usar FormData y no JSON
+    let url = '';
+    if (form.categoria === 'vivienda') {
+      url = 'http://localhost:8000/api/viviendas/';
+      payload = {
+        ...payload,
+        ambientes: form.ambientes,
+        huespedes: form.huespedes,
+        baños: form.banios,
+        caracteristicas: form.atributos.join(', '),
+        atributos: form.atributos,
+      };
+    } else if (form.categoria === 'cochera') {
+      url = 'http://localhost:8000/api/cocheras/';
+      payload = {
+        ...payload,
+        cupo_de_autos: 1, // Podrías agregar un campo para esto si lo necesitás
+        caracteristicas: '',
+      };
+    } else if (form.categoria === 'local') {
+      url = 'http://localhost:8000/api/local/';
+      payload = {
+        ...payload,
+        metros_cuadrados: form.metros_cuadrados,
+        caracteristicas: '',
+      };
+    }
 
     try {
-      const res = await fetch('http://localhost:8000/api/viviendas/', {
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
-
       if (res.ok) {
         setSuccess('Propiedad registrada correctamente.');
         setForm({
@@ -165,11 +194,15 @@ export default function CargarPropiedad() {
           titulo: '',
           descripcion: '',
           ciudad: '',
-          direccion: '',
+          direccion_calle: '',
+          direccion_numero: '',
+          direccion_piso: '',
+          direccion_departamento: '',
           politica: '',
           ambientes: 1,
           huespedes: 1,
           banios: 1,
+          metros_cuadrados: '',
           precio: '',
           diasMin: '',
           atributos: [],
@@ -205,330 +238,449 @@ export default function CargarPropiedad() {
           padding: 36,
           border: `2.5px solid ${RENTAX_RED}`,
           display: 'flex',
-          flexDirection: 'row',
-          gap: 32,
+          flexDirection: 'column',
+          gap: 0,
+          position: 'relative',
         }}
       >
-        {/* IZQUIERDA */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 22,
-          background: RENTAX_GRAY,
-          borderRadius: 16,
-          padding: 24,
-          border: `2px solid ${RENTAX_LIGHT_RED}`,
-        }}>
-          <h1 style={{
-            textAlign: 'center',
-            color: RENTAX_RED,
-            fontWeight: 900,
-            fontSize: 28,
-            marginBottom: 10,
-            letterSpacing: 1,
-          }}>Datos principales</h1>
-
-          {/* Titulo */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Título</label>
-          <input
-            name="titulo"
-            value={form.titulo}
-            onChange={handleChange}
-            type="text"
-            placeholder="Ej: Monoambiente en Palermo"
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-            }}
-          />
-
-          {/* Descripción */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Descripción</label>
-          <textarea
-            name="descripcion"
-            value={form.descripcion}
-            onChange={handleChange}
-            placeholder="Describe la propiedad..."
-            rows={3}
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-              resize: 'vertical',
-            }}
-          />
-
-          {/* Ciudad */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Ciudad</label>
-          <input
-            name="ciudad"
-            value={form.ciudad}
-            onChange={handleChange}
-            type="text"
-            placeholder="Ej: Buenos Aires"
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-            }}
-          />
-
-          {/* Dirección */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Dirección</label>
-          <input
-            name="direccion"
-            value={form.direccion}
-            onChange={handleChange}
-            type="text"
-            placeholder="Ej: Callao y Rivadavia"
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-            }}
-          />
-
-          {/* Categoria */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Categoría</label>
-          <select
-            name="categoria"
-            value={form.categoria}
-            onChange={handleChange}
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-            }}
-          >
-            <option value="">Seleccionar categoría</option>
-            {CATEGORIAS.map(c => (
-              <option key={c.value} value={c.value}>{c.label}</option>
-            ))}
-          </select>
-
-          {/* Política de cancelación */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Política de cancelación</label>
-          <select
-            name="politica"
-            value={form.politica}
-            onChange={handleChange}
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-            }}
-          >
-            <option value="">Seleccionar política</option>
-            {POLITICAS.map(p => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
+        {/* SELECTOR DE TIPO DE PROPIEDAD */}
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 32,
+            padding: '18px 0 22px 0',
+            background: '#f2c6b3',
+            borderRadius: 18,
+            border: `4px solid ${RENTAX_RED}`,
+            marginBottom: 36,
+            marginTop: 30,
+            boxShadow: '0 4px 18px #ff572244',
+            position: 'relative',
+            zIndex: 10,
+          }}
+        >
+          {CATEGORIAS.map(c => (
+            <button
+              key={c.value}
+              type="button"
+              onClick={() => setForm(f => ({ ...f, categoria: c.value }))}
+              style={{
+                fontSize: 26,
+                fontWeight: 900,
+                padding: '18px 38px',
+                borderRadius: 14,
+                border: form.categoria === c.value ? `4px solid ${RENTAX_RED}` : `3px solid #bbb`,
+                background: form.categoria === c.value ? RENTAX_LIGHT_RED : '#f5f6fa',
+                color: form.categoria === c.value ? RENTAX_RED : '#333',
+                boxShadow: form.categoria === c.value ? '0 2px 12px #ff572244' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                outline: 'none',
+              }}
+            >
+              {c.label}
+            </button>
+          ))}
         </div>
 
-        {/* DERECHA */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 22,
-          background: RENTAX_GRAY,
-          borderRadius: 16,
-          padding: 24,
-          border: `2px solid ${RENTAX_LIGHT_RED}`,
-        }}>
-          <h1 style={{
-            textAlign: 'center',
-            color: RENTAX_RED,
-            fontWeight: 900,
-            fontSize: 28,
-            marginBottom: 10,
-            letterSpacing: 1,
-          }}>Características y fotos</h1>
-
-          {/* Ambientes, Huespedes, Baños */}
-          <div style={{
+        {/* RECUADRO GENERAL DEL FORMULARIO */}
+        <div
+          style={{
+            width: '100%',
+            background: '#fbeee2',
+            borderRadius: 22,
+            border: `3px solid ${RENTAX_RED}`,
+            boxShadow: '0 6px 32px #ff572244',
+            padding: '36px 28px 28px 28px',
+            marginTop: 18,
             display: 'flex',
-            gap: 18,
-            justifyContent: 'space-between',
+            flexDirection: 'row',
+            gap: 32,
+            position: 'relative',
+          }}
+        >
+          {/* IZQUIERDA */}
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 22,
+            background: RENTAX_GRAY,
+            borderRadius: 16,
+            padding: 24,
+            border: `2px solid ${RENTAX_LIGHT_RED}`,
+            marginTop: 0,
           }}>
-            {/* Ambientes */}
-            <div style={{ flex: 1 }}>
-              <label style={{ fontWeight: 700, color: '#333' }}>Ambientes</label>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                background: '#fff', borderRadius: 10, padding: '8px 10px',
-                border: `2px solid ${RENTAX_LIGHT_RED}`,
-                marginTop: 2,
-              }}>
-                <button type="button" onClick={() => handleSumar('ambientes', -1)}
-                  style={{
-                    fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
-                  }}>–</button>
-                <span style={{ fontSize: 20, fontWeight: 700, width: 28, textAlign: 'center' }}>{form.ambientes}</span>
-                <button type="button" onClick={() => handleSumar('ambientes', 1)}
-                  style={{
-                    fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
-                  }}>+</button>
-              </div>
-            </div>
-            {/* Huespedes */}
-            <div style={{ flex: 1 }}>
-              <label style={{ fontWeight: 700, color: '#333' }}>Huéspedes</label>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                background: '#fff', borderRadius: 10, padding: '8px 10px',
-                border: `2px solid ${RENTAX_LIGHT_RED}`,
-                marginTop: 2,
-              }}>
-                <button type="button" onClick={() => handleSumar('huespedes', -1)}
-                  style={{
-                    fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
-                  }}>–</button>
-                <span style={{ fontSize: 20, fontWeight: 700, width: 28, textAlign: 'center' }}>{form.huespedes}</span>
-                <button type="button" onClick={() => handleSumar('huespedes', 1)}
-                  style={{
-                    fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
-                  }}>+</button>
-              </div>
-            </div>
-            {/* Baños */}
-            <div style={{ flex: 1 }}>
-              <label style={{ fontWeight: 700, color: '#333' }}>Baños</label>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                background: '#fff', borderRadius: 10, padding: '8px 10px',
-                border: `2px solid ${RENTAX_LIGHT_RED}`,
-                marginTop: 2,
-              }}>
-                <button type="button" onClick={() => handleSumar('banios', -1)}
-                  style={{
-                    fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
-                  }}>–</button>
-                <span style={{ fontSize: 20, fontWeight: 700, width: 28, textAlign: 'center' }}>{form.banios}</span>
-                <button type="button" onClick={() => handleSumar('banios', 1)}
-                  style={{
-                    fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
-                  }}>+</button>
-              </div>
-            </div>
-          </div>
+            <h1 style={{
+              textAlign: 'center',
+              color: RENTAX_RED,
+              fontWeight: 900,
+              fontSize: 28,
+              marginBottom: 10,
+              letterSpacing: 1,
+            }}>Datos principales</h1>
 
-          {/* Precio por día */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Precio por día (USD)</label>
-          <input
-            name="precio"
-            value={form.precio}
-            onChange={handleChange}
-            type="number"
-            min={1}
-            placeholder="Ej: 30"
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-            }}
-          />
-
-          {/* Días mínimos */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Cantidad mínima de días de alquiler</label>
-          <input
-            name="diasMin"
-            value={form.diasMin}
-            onChange={handleChange}
-            type="number"
-            min={1}
-            placeholder="Ej: 5"
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 18,
-              background: '#fff',
-            }}
-          />
-
-          {/* Atributos */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Atributos</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-            {ATRIBUTOS.map(attr => (
-              <label key={attr.value} style={{
-                display: 'flex', alignItems: 'center', gap: 7,
-                background: form.atributos.includes(attr.value) ? RENTAX_LIGHT_RED : '#fff',
-                border: `2px solid ${form.atributos.includes(attr.value) ? RENTAX_RED : RENTAX_LIGHT_RED}`,
+            {/* Titulo */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Título</label>
+            <input
+              name="titulo"
+              value={form.titulo}
+              onChange={handleChange}
+              type="text"
+              placeholder="Ej: Monoambiente en Palermo"
+              style={{
+                border: `2px solid ${RENTAX_RED}`,
                 borderRadius: 10,
-                padding: '8px 18px',
-                cursor: 'pointer',
-                fontWeight: 600,
-              }}>
-                <input
-                  type="checkbox"
-                  checked={form.atributos.includes(attr.value)}
-                  onChange={() => handleAtributo(attr.value)}
-                  style={{ accentColor: RENTAX_RED, width: 18, height: 18 }}
-                />
-                <span>{attr.label}</span>
-              </label>
-            ))}
+                padding: '12px 16px',
+                fontSize: 18,
+                background: '#fff',
+              }}
+            />
+
+            {/* Descripción */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Descripción</label>
+            <textarea
+              name="descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              placeholder="Describe la propiedad..."
+              rows={3}
+              style={{
+                border: `2px solid ${RENTAX_RED}`,
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 18,
+                background: '#fff',
+                resize: 'vertical',
+              }}
+            />
+
+            {/* Ciudad */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Ciudad</label>
+            <input
+              name="ciudad"
+              value={form.ciudad}
+              onChange={handleChange}
+              type="text"
+              placeholder="Ej: Buenos Aires"
+              style={{
+                border: `2px solid ${RENTAX_RED}`,
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 18,
+                background: '#fff',
+              }}
+            />
+
+            {/* Dirección */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Dirección</label>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <input
+                name="direccion_calle"
+                value={form.direccion_calle}
+                onChange={handleChange}
+                type="text"
+                placeholder="Calle"
+                style={{
+                  border: `2px solid ${RENTAX_RED}`,
+                  borderRadius: 10,
+                  padding: '12px 10px',
+                  fontSize: 16,
+                  background: '#fff',
+                  flex: 2,
+                }}
+              />
+              <input
+                name="direccion_numero"
+                value={form.direccion_numero}
+                onChange={handleChange}
+                type="number"
+                placeholder="N°"
+                style={{
+                  border: `2px solid ${RENTAX_RED}`,
+                  borderRadius: 10,
+                  padding: '12px 10px',
+                  fontSize: 16,
+                  background: '#fff',
+                  width: 80,
+                }}
+              />
+              <input
+                name="direccion_piso"
+                value={form.direccion_piso}
+                onChange={handleChange}
+                type="number"
+                placeholder="Piso"
+                style={{
+                  border: `2px solid ${RENTAX_RED}`,
+                  borderRadius: 10,
+                  padding: '12px 10px',
+                  fontSize: 16,
+                  background: '#fff',
+                  width: 70,
+                }}
+              />
+              <input
+                name="direccion_departamento"
+                value={form.direccion_departamento}
+                onChange={handleChange}
+                type="text"
+                placeholder="Depto"
+                style={{
+                  border: `2px solid ${RENTAX_RED}`,
+                  borderRadius: 10,
+                  padding: '12px 10px',
+                  fontSize: 16,
+                  background: '#fff',
+                  width: 70,
+                }}
+              />
+            </div>
+
+            {/* Política de cancelación */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Política de cancelación</label>
+            <select
+              name="politica"
+              value={form.politica}
+              onChange={handleChange}
+              style={{
+                border: `2px solid ${RENTAX_RED}`,
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 18,
+                background: '#fff',
+              }}
+            >
+              <option value="">Seleccionar política</option>
+              {POLITICAS.map(p => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
           </div>
 
-          {/* Cargar fotos */}
-          <label style={{ fontWeight: 700, color: '#333' }}>Fotos</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            ref={fileInputRef}
-            onChange={handleFotos}
-            style={{
-              border: `2px solid ${RENTAX_RED}`,
-              borderRadius: 10,
-              padding: '10px',
-              background: '#fff',
-              fontSize: 16,
-            }}
-          />
-          {/* Previews */}
-          {fotoPreviews.length > 0 && (
-            <div style={{
-              display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 8,
-            }}>
-              {fotoPreviews.map((src, idx) => (
-                <img
-                  key={idx}
-                  src={src}
-                  alt={`Foto ${idx + 1}`}
+          {/* DERECHA */}
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 22,
+            background: RENTAX_GRAY,
+            borderRadius: 16,
+            padding: 24,
+            border: `2px solid ${RENTAX_LIGHT_RED}`,
+            marginTop: 0,
+          }}>
+            <h1 style={{
+              textAlign: 'center',
+              color: RENTAX_RED,
+              fontWeight: 900,
+              fontSize: 28,
+              marginBottom: 10,
+              letterSpacing: 1,
+            }}>Características y fotos</h1>
+
+            {/* Vivienda: Ambientes, Huespedes, Baños, Atributos */}
+            {form.categoria === 'vivienda' && (
+              <>
+                {/* Ambientes, Huespedes, Baños */}
+                <div style={{
+                  display: 'flex',
+                  gap: 18,
+                  justifyContent: 'space-between',
+                }}>
+                  {/* Ambientes */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontWeight: 700, color: '#333' }}>Ambientes</label>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      background: '#fff', borderRadius: 10, padding: '8px 10px',
+                      border: `2px solid ${RENTAX_LIGHT_RED}`,
+                      marginTop: 2,
+                    }}>
+                      <button type="button" onClick={() => handleSumar('ambientes', -1)}
+                        style={{
+                          fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
+                        }}>–</button>
+                      <span style={{ fontSize: 20, fontWeight: 700, width: 28, textAlign: 'center' }}>{form.ambientes}</span>
+                      <button type="button" onClick={() => handleSumar('ambientes', 1)}
+                        style={{
+                          fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
+                        }}>+</button>
+                    </div>
+                  </div>
+                  {/* Huespedes */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontWeight: 700, color: '#333' }}>Huéspedes</label>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      background: '#fff', borderRadius: 10, padding: '8px 10px',
+                      border: `2px solid ${RENTAX_LIGHT_RED}`,
+                      marginTop: 2,
+                    }}>
+                      <button type="button" onClick={() => handleSumar('huespedes', -1)}
+                        style={{
+                          fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
+                        }}>–</button>
+                      <span style={{ fontSize: 20, fontWeight: 700, width: 28, textAlign: 'center' }}>{form.huespedes}</span>
+                      <button type="button" onClick={() => handleSumar('huespedes', 1)}
+                        style={{
+                          fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
+                        }}>+</button>
+                    </div>
+                  </div>
+                  {/* Baños */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontWeight: 700, color: '#333' }}>Baños</label>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      background: '#fff', borderRadius: 10, padding: '8px 10px',
+                      border: `2px solid ${RENTAX_LIGHT_RED}`,
+                      marginTop: 2,
+                    }}>
+                      <button type="button" onClick={() => handleSumar('banios', -1)}
+                        style={{
+                          fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
+                        }}>–</button>
+                      <span style={{ fontSize: 20, fontWeight: 700, width: 28, textAlign: 'center' }}>{form.banios}</span>
+                      <button type="button" onClick={() => handleSumar('banios', 1)}
+                        style={{
+                          fontSize: 22, color: RENTAX_RED, border: 'none', background: 'none', cursor: 'pointer', fontWeight: 900,
+                        }}>+</button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Atributos */}
+                <label style={{ fontWeight: 700, color: '#333' }}>Atributos</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
+                  {ATRIBUTOS.map(attr => (
+                    <label key={attr.value} style={{
+                      display: 'flex', alignItems: 'center', gap: 7,
+                      background: form.atributos.includes(attr.value) ? RENTAX_LIGHT_RED : '#fff',
+                      border: `2px solid ${form.atributos.includes(attr.value) ? RENTAX_RED : RENTAX_LIGHT_RED}`,
+                      borderRadius: 10,
+                      padding: '8px 18px',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={form.atributos.includes(attr.value)}
+                        onChange={() => handleAtributo(attr.value)}
+                        style={{ accentColor: RENTAX_RED, width: 18, height: 18 }}
+                      />
+                      <span>{attr.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Local: Metros cuadrados */}
+            {form.categoria === 'local' && (
+              <>
+                <label style={{ fontWeight: 700, color: '#333' }}>Metros cuadrados</label>
+                <input
+                  name="metros_cuadrados"
+                  value={form.metros_cuadrados}
+                  onChange={handleChange}
+                  type="number"
+                  min={1}
+                  placeholder="Ej: 100"
                   style={{
-                    width: 90, height: 70, objectFit: 'cover', borderRadius: 8, border: `2px solid ${RENTAX_RED}`,
-                    boxShadow: '0 1px 6px #ff572244',
+                    border: `2px solid ${RENTAX_RED}`,
+                    borderRadius: 10,
+                    padding: '12px 16px',
+                    fontSize: 18,
                     background: '#fff',
                   }}
                 />
-              ))}
-            </div>
-          )}
+              </>
+            )}
+
+            {/* Precio por día */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Precio por día (USD)</label>
+            <input
+              name="precio"
+              value={form.precio}
+              onChange={handleChange}
+              type="number"
+              min={1}
+              placeholder="Ej: 30"
+              style={{
+                border: `2px solid ${RENTAX_RED}`,
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 18,
+                background: '#fff',
+              }}
+            />
+
+            {/* Días mínimos */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Cantidad mínima de días de alquiler</label>
+            <input
+              name="diasMin"
+              value={form.diasMin}
+              onChange={handleChange}
+              type="number"
+              min={1}
+              placeholder="Ej: 5"
+              style={{
+                border: `2px solid ${RENTAX_RED}`,
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 18,
+                background: '#fff',
+              }}
+            />
+
+            {/* Cargar fotos */}
+            <label style={{ fontWeight: 700, color: '#333' }}>Fotos</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              ref={fileInputRef}
+              onChange={handleFotos}
+              style={{
+                border: `2px solid ${RENTAX_RED}`,
+                borderRadius: 10,
+                padding: '10px',
+                background: '#fff',
+                fontSize: 16,
+              }}
+            />
+            {/* Previews */}
+            {fotoPreviews.length > 0 && (
+              <div style={{
+                display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 8,
+              }}>
+                {fotoPreviews.map((src, idx) => (
+                  <img
+                    key={idx}
+                    src={src}
+                    alt={`Foto ${idx + 1}`}
+                    style={{
+                      width: 90, height: 70, objectFit: 'cover', borderRadius: 8, border: `2px solid ${RENTAX_RED}`,
+                      boxShadow: '0 1px 6px #ff572244',
+                      background: '#fff',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Mensajes y botón */}
         <div style={{
-          position: 'absolute',
-          left: 0, right: 0, bottom: 30,
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginTop: 32,
         }}>
           {error && <div style={{ color: 'red', fontWeight: 700, marginTop: 8 }}>{error}</div>}
           {success && <div style={{ color: 'green', fontWeight: 700, marginTop: 8 }}>{success}</div>}

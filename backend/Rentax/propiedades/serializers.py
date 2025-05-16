@@ -37,6 +37,7 @@ class ViviendaSerializer(serializers.ModelSerializer):
 
 class LocalComercialSerializer(serializers.ModelSerializer):
     direccion = DireccionSerializer()
+    metros_cuadrados = serializers.FloatField()
     class Meta:
         model = LocalComercial
         fields = '__all__'
