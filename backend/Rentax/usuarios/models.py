@@ -5,7 +5,7 @@ class Persona(models.Model):
     dni=models.CharField(max_length=8)
     nombre=models.CharField(max_length=70)
     apellido=models.CharField(max_length=70)
-    email=models.CharField(max_length=60)
+    email=models.CharField(max_length=60, unique=True)
     fecha_nacimiento=models.DateField()
     sexo=models.CharField(max_length=20)
     password=models.CharField(max_length=50,null=True)

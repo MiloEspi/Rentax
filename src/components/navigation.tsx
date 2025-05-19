@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 
 export const Navigation = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     // Chequea el estado al montar y cuando cambia el storage
     useEffect(() => {
         const checkLogin = () => {
             setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+            setIsAdmin(localStorage.getItem("isAdmin") === "true");
         };
 
         checkLogin();
@@ -41,6 +43,17 @@ export const Navigation = () => {
                             About
                         </Link>
                     </li>
+                    {/* Botón solo visible para admin */}
+                    {isLoggedIn && isAdmin &&  (
+                        <li>
+                            <Link
+                                href="/cargarPropiedad"
+                                className="text-white bg-purple-600 border border-purple-600 px-4 py-2 rounded hover:bg-purple-700"
+                            >
+                                Cargar Propiedad
+                            </Link>
+                        </li>
+                    )}
                 </div>
                 <div className="ml-auto flex space-x-4">
                     {!isLoggedIn && (
@@ -63,15 +76,19 @@ export const Navigation = () => {
                             </li>
                         </>
                     )}
-                    {isLoggedIn && (
+                    {isLoggedIn &&  (
                         <>
                             <li>
-                                <button
-                                    className="text-white bg-red-500 border border-red-500 px-4 py-2 rounded hover:bg-red-600"
-                                    onClick={() => setShowLogoutModal(true)}
-                                >
-                                    Cerrar sesión
-                                </button>
+    <button
+        className="text-white bg-red-500 border border-red-500 px-4 py-2 rounded hover:bg-red-600"
+        onClick={() => {
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("isAdmin"); // <-- Elimina el flag de admin
+            setShowLogoutModal(true);
+        }}
+    >
+        Cerrar sesión
+    </button>
                             </li>
                         </>
                     )}

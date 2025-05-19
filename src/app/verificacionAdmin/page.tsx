@@ -52,8 +52,10 @@ export default function VerificacionAdmin() {
         });
         const data = await res.json();
         if (res.ok && data.success) {
-            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('isLoggedIn', 'true');                        
+            localStorage.setItem('isAdmin', 'true'); // <-- ESTA LÍNEA AGREGA EL FLAG DE ADMIN
             localStorage.removeItem('adminEmail');
+
             window.location.href = '/';
         } else {
             setError(data.error || "Código incorrecto.");
@@ -82,3 +84,5 @@ export default function VerificacionAdmin() {
         </div>
     );
 }
+
+
