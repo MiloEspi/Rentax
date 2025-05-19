@@ -154,3 +154,5 @@ EMAIL_HOST_USER = 'rentaxalquiler@gmail.com'
 EMAIL_HOST_PASSWORD = 'scmz bogc yuku zfrk'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

@@ -1,19 +1,32 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import Propiedad, Politica_De_Cancelacion, Localidad
+from .models import Propiedad, Politica_De_Cancelacion, Localidad, LocalComercial, Cochera, Vivienda
 from .serializers import PropiedadSerializer, PoliticaSerializer, LocalidadSerializer, ViviendaSerializer, CocheraSerializer, LocalComercialSerializer, PoliticaSinReembolsoSerializer, PoliticaConReembolsoCompletoSerializer, PoliticaConReembolsoParcialSerializer
 from rest_framework import generics
-
+from django.shortcuts import get_object_or_404
  
 
-class PropiedadDetailView(generics.RetrieveAPIView):
-    queryset = Propiedad.objects.all()
-    serializer_class = PropiedadSerializer
+class PropiedadDetailView(APIView):
+    def get(self, request, pk):
+        propiedad = get_object_or_404(Propiedad, pk=pk)
+        tipo = propiedad.tipoPropiedad.lower()
+        if tipo == "vivienda":
+            instancia = Vivienda.objects.get(pk=pk)
+            serializer = ViviendaSerializer(instancia, context={'request': request})
+        elif tipo == "cochera":
+            instancia = Cochera.objects.get(pk=pk)
+            serializer = CocheraSerializer(instancia)
+        elif tipo == "localcomercial":
+            instancia = LocalComercial.objects.get(pk=pk)
+            serializer = LocalComercialSerializer(instancia)
+        else:
+            return Response({"error": "Tipo de propiedad desconocido"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)
  
 class ViviendaCreateView(APIView):
     def post(self, request):
-        serializer = ViviendaSerializer(data=request.data)
+        serializer = ViviendaSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             vivienda = serializer.save()
             return Response(ViviendaSerializer(vivienda).data, status=status.HTTP_201_CREATED)
