@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, ReactNode } from 'react';
 
 const RENTAX_RED = '#ff5a1f';
 const RENTAX_LIGHT_RED = '#ffe7db';
@@ -10,12 +10,6 @@ const CATEGORIAS = [
   { label: 'Vivienda', value: 'vivienda' },
   { label: 'Local', value: 'local' },
   { label: 'Cochera', value: 'cochera' },
-];
-
-const POLITICAS = [
-  { label: 'Sin reembolso', value: 'sin_reembolso' },
-  { label: 'Reembolso parcial', value: 'parcial' },
-  { label: 'Reembolso total', value: 'total' },
 ];
 
 const ATRIBUTOS = [
@@ -42,7 +36,7 @@ export default function CargarPropiedad() {
     banios: 1,
     metros_cuadrados: '',
     precio: '',
-    diasMin: '',
+    cantidadDiasMinimo: '',
     atributos: [] as string[],
     fotos: [] as File[],
   });
@@ -51,7 +45,23 @@ export default function CargarPropiedad() {
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // NUEVO: Estados para políticas y ciudades desde el backend
+  const [politicas, setPoliticas] = useState<{
+    politica: ReactNode; id: number, nombre: string 
+}[]>([]);
+  const [ciudades, setCiudades] = useState<{ id: number, nombre: string }[]>([]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Cargar políticas y ciudades al montar el componente
+  useEffect(() => {
+    fetch('http://localhost:8000/politicas/')
+      .then(res => res.json())
+      .then(data => setPoliticas(data));
+    fetch('http://localhost:8000/localidades/')
+      .then(res => res.json())
+      .then(data => setCiudades(data));
+  }, []);
 
   // Manejo de campos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -71,6 +81,11 @@ export default function CargarPropiedad() {
   // Manejo de fotos
   const handleFotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (files.length > 20) {
+      setError('Solo se pueden cargar hasta 20 fotos.');
+      return;
+    }
+    setError('');
     setForm(f => ({ ...f, fotos: files }));
     setFotoPreviews(files.map(file => URL.createObjectURL(file)));
   };
@@ -93,21 +108,21 @@ export default function CargarPropiedad() {
     if (!form.direccion_numero) return 'Debe ingresar el número.';
     if (form.categoria === 'vivienda') {
       if (!form.ambientes || !form.huespedes || !form.banios)
-        return 'Debe indicar ambientes, huéspedes y baños.';
+        return 'Debe indicar ambientes, huéspedes y banios.';
     }
     if (form.categoria === 'local') {
       if (!form.metros_cuadrados) return 'Debe indicar los metros cuadrados.';
     }
     if (!form.precio) return 'Debe indicar el precio por día.';
-    if (!form.diasMin) return 'Debe seleccionar la cantidad mínima de días.';
+    if (!form.cantidadDiasMinimo) return 'Debe seleccionar la cantidad mínima de días.';
     if (!form.politica) return 'Debe seleccionar la política de cancelación.';
-    if (!form.fotos.length) return 'Debe cargar al menos una foto.';
+    if (form.fotos.length < 3) return 'Como minimo se tienen que cargar 3 fotos.';
+    if (form.fotos.length > 20) return 'Solo se pueden cargar hasta 20 fotos.';
     return null;
   };
 
   // Simulación de verificación de título único (debería ser backend)
   const checkTituloUnico = async (titulo: string) => {
-    // Simular que "Monoambiente en Palermo" ya existe
     if (titulo.trim().toLowerCase() === 'monoambiente en palermo') {
       return false;
     }
@@ -128,7 +143,6 @@ export default function CargarPropiedad() {
 
     setIsSubmitting(true);
 
-    // Regla de título único (simulada, el backend también valida)
     const unico = await checkTituloUnico(form.titulo);
     if (!unico) {
       setError('El título de la propiedad debe ser único. Ya existe una propiedad con ese título.');
@@ -136,56 +150,78 @@ export default function CargarPropiedad() {
       return;
     }
 
-    // Armar JSON para el backend según tipo
-    let payload: any = {
-      titulo: form.titulo,
-      descripcion: form.descripcion,
-      precio: form.precio,
-      cantidadDiasMinimo: form.diasMin,
-      politica: form.politica,
-      localidad: form.ciudad,
-      direccion: {
-        calle: form.direccion_calle,
-        numero: form.direccion_numero,
-        piso: form.direccion_piso || null,
-        departamento: form.direccion_departamento || null,
-      },
-    };
+    // Buscar el ID de la política seleccionada
+    const politicaObj = politicas.find(p => String(p.id) === form.politica || p.nombre === form.politica);
+    // Buscar el ID de la ciudad seleccionada
+    const ciudadObj = ciudades.find(c => String(c.id) === form.ciudad || c.nombre === form.ciudad);
 
     let url = '';
+    let categoriaPayload: any = {};
     if (form.categoria === 'vivienda') {
-      url = 'http://localhost:8000/api/viviendas/';
-      payload = {
-        ...payload,
+      url = 'http://localhost:8000/viviendas/';
+      categoriaPayload = {
         ambientes: form.ambientes,
         huespedes: form.huespedes,
-        baños: form.banios,
-        caracteristicas: form.atributos.join(', '),
-        atributos: form.atributos,
+        banios: form.banios,
+        atributos: JSON.stringify(form.atributos), // serializar array
       };
     } else if (form.categoria === 'cochera') {
-      url = 'http://localhost:8000/api/cocheras/';
-      payload = {
-        ...payload,
-        cupo_de_autos: 1, // Podrías agregar un campo para esto si lo necesitás
-        caracteristicas: '',
+      url = 'http://localhost:8000/cocheras/';
+      categoriaPayload = {
+        cupo_de_autos: 1,
       };
     } else if (form.categoria === 'local') {
-      url = 'http://localhost:8000/api/local/';
-      payload = {
-        ...payload,
+      url = 'http://localhost:8000/local/';
+      categoriaPayload = {
         metros_cuadrados: form.metros_cuadrados,
-        caracteristicas: '',
       };
     }
+
+    // Construir FormData
+    const formData = new FormData();
+    formData.append('titulo', form.titulo);
+    formData.append('descripcion', form.descripcion);
+    formData.append('precio', form.precio);
+    formData.append('cantidadDiasMinimo', form.cantidadDiasMinimo);
+    formData.append('politica', politicaObj ? String(politicaObj.id) : form.politica);
+    formData.append('localidad', ciudadObj ? String(ciudadObj.id) : form.ciudad);
+
+    // Enviar los campos de dirección directamente
+    formData.append('calle', form.direccion_calle);
+    formData.append(
+      'numero',
+      form.direccion_numero && !isNaN(Number(form.direccion_numero))
+        ? String(Number(form.direccion_numero))
+        : ''
+    );
+    formData.append(
+      'piso',
+      form.direccion_piso && !isNaN(Number(form.direccion_piso))
+        ? String(Number(form.direccion_piso))
+        : ''
+    );
+    formData.append(
+      'departamento',
+      form.direccion_departamento && form.direccion_departamento.trim() !== ''
+        ? form.direccion_departamento.trim()
+        : ''
+    );
+
+    // Agregar campos específicos de la categoría
+    Object.entries(categoriaPayload).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, typeof value === 'string' ? value : String(value));
+      }
+    });
+    // Agregar fotos
+    form.fotos.forEach((file, idx) => {
+      formData.append('fotos []', file);
+    });
 
     try {
       const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
       if (res.ok) {
         setSuccess('Propiedad registrada correctamente.');
@@ -204,16 +240,29 @@ export default function CargarPropiedad() {
           banios: 1,
           metros_cuadrados: '',
           precio: '',
-          diasMin: '',
+          cantidadDiasMinimo: '',
           atributos: [],
           fotos: [],
         });
+        // Limpiar el input de archivos
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
         setFotoPreviews([]);
       } else {
-        const data = await res.json();
-        setError(data.titulo || data.detail || 'Error al registrar la propiedad');
+        // Intenta parsear la respuesta como JSON, si es posible
+        let errorMsg = 'Error al registrar la propiedad';
+        try {
+          const data = await res.json();
+          errorMsg = data.titulo || data.detail || JSON.stringify(data) || errorMsg;
+        } catch {
+          // Si no es JSON, usa texto plano
+          const text = await res.text();
+          if (text) errorMsg = text;
+        }
+        setError(errorMsg);
       }
-    } catch (e) {
+    } catch (e: any) {
       setError('Error de conexión con el servidor');
     } finally {
       setIsSubmitting(false);
@@ -359,12 +408,10 @@ export default function CargarPropiedad() {
 
             {/* Ciudad */}
             <label style={{ fontWeight: 700, color: '#333' }}>Ciudad</label>
-            <input
+            <select
               name="ciudad"
               value={form.ciudad}
               onChange={handleChange}
-              type="text"
-              placeholder="Ej: Buenos Aires"
               style={{
                 border: `2px solid ${RENTAX_RED}`,
                 borderRadius: 10,
@@ -372,7 +419,12 @@ export default function CargarPropiedad() {
                 fontSize: 18,
                 background: '#fff',
               }}
-            />
+            >
+              <option value="">Seleccionar ciudad</option>
+              {ciudades.map(c => (
+                <option key={c.id} value={c.id}>{c.nombre}</option>
+              ))}
+            </select>
 
             {/* Dirección */}
             <label style={{ fontWeight: 700, color: '#333' }}>Dirección</label>
@@ -454,8 +506,8 @@ export default function CargarPropiedad() {
               }}
             >
               <option value="">Seleccionar política</option>
-              {POLITICAS.map(p => (
-                <option key={p.value} value={p.value}>{p.label}</option>
+              {politicas.map(p => (
+                <option key={p.id} value={p.id}>{p.politica}</option>
               ))}
             </select>
           </div>
@@ -621,8 +673,8 @@ export default function CargarPropiedad() {
             {/* Días mínimos */}
             <label style={{ fontWeight: 700, color: '#333' }}>Cantidad mínima de días de alquiler</label>
             <input
-              name="diasMin"
-              value={form.diasMin}
+              name="cantidadDiasMinimo"
+              value={form.cantidadDiasMinimo}
               onChange={handleChange}
               type="number"
               min={1}
@@ -651,6 +703,8 @@ export default function CargarPropiedad() {
                 background: '#fff',
                 fontSize: 16,
               }}
+              // Limitar selección a 20 archivos desde el input (no todos los navegadores lo respetan)
+              max={20}
             />
             {/* Previews */}
             {fotoPreviews.length > 0 && (
