@@ -1,11 +1,6 @@
 from django.db import models
 
 # Create your models here.
-class Direccion(models.Model):
-    calle=models.CharField()
-    numero=models.IntegerField()
-    piso=models.IntegerField(null=True)
-    departamento=models.CharField(max_length=10,null=True)
 class Persona(models.Model):
     dni=models.CharField(max_length=8)
     nombre=models.CharField(max_length=70)
@@ -21,5 +16,5 @@ class Usuario(models.Model):
 class Empleado(models.Model):
     persona=models.OneToOneField(Persona, on_delete=models.CASCADE)
 class Gerente(models.Model):
-    persona=models.OneToOneField(Persona, on_delete=models.CASCADE)    
+    persona=models.OneToOneField(Persona, on_delete=models.CASCADE)
 

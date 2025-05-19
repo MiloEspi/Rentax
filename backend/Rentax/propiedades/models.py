@@ -1,6 +1,4 @@
 from django.db import models
-from usuarios.models import Direccion
-
 # Create your models here.
 class Localidad(models.Model):
     codigoPostal=models.IntegerField()
@@ -17,9 +15,11 @@ class PoliticaConReembolsoParcial(models.Model):
     politica=models.OneToOneField(Politica_De_Cancelacion, on_delete=models.CASCADE)
 class Propiedad(models.Model):
     titulo = models.TextField(max_length=400)
-    direccion = models.ForeignKey(Direccion, on_delete=models.CASCADE)
+    calle = models.CharField(max_length=255)
+    numero = models.IntegerField()
+    piso = models.IntegerField(null=True, blank=True)
+    departamento = models.CharField(max_length=10, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    ambientes = models.IntegerField()
     descripcion = models.TextField()
     politica=models.ForeignKey(Politica_De_Cancelacion,on_delete=models.SET_NULL, null=True)
     localidad=models.ForeignKey(Localidad,on_delete=models.CASCADE, null=True)
@@ -34,13 +34,12 @@ class FotoPropiedad(models.Model):
 class Cochera(Propiedad):
     cupo_de_autos=models.IntegerField()
 class Vivienda(Propiedad):
-    caracteristicas = models.TextField(max_length=200) 
     huespedes = models.IntegerField(null=True)
     cantidadDiasMinimo = models.IntegerField(null=True)
-    baños = models.IntegerField(null=True)
+    banios = models.IntegerField(null=True)
+    ambientes = models.IntegerField()
     # Nuevos campos
     atributos = models.JSONField(default=list, blank=True)  # Ej: ["wifi", "pileta"]
     # Las fotos se relacionan por el modelo FotoPropiedad
 class LocalComercial(Propiedad):
-    caracteristicas = models.TextField(max_length=200)
     metros_cuadrados = models.IntegerField(null=True, blank=True)

@@ -1,67 +1,111 @@
 from rest_framework import serializers
-from .models import Propiedad, Politica_De_Cancelacion, Localidad, Vivienda, LocalComercial, Cochera, PoliticaSinReembolso, PoliticaConReembolsoCompleto, PoliticaConReembolsoParcial
-from usuarios.models import Direccion
-class DireccionSerializer(serializers.ModelSerializer):
+from .models import Propiedad, Politica_De_Cancelacion, Localidad, Vivienda, LocalComercial, Cochera, PoliticaSinReembolso, PoliticaConReembolsoCompleto, PoliticaConReembolsoParcial, FotoPropiedad
+import json
+
+class FotoPropiedadSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Direccion
-        fields = '__all__'
+        model = FotoPropiedad
+        fields = ['id', 'imagen', 'descripcion']
+
+def clean_direccion_fields(validated_data):
+    # Convierte '' a None y castea a int si corresponde
+    for field in ['numero', 'piso']:
+        value = validated_data.get(field, None)
+        if value in ('', None):
+            validated_data[field] = None
+        else:
+            try:
+                validated_data[field] = int(value)
+            except Exception:
+                validated_data[field] = None
+    # departamento: '' a None
+    if validated_data.get('departamento', None) in ('', None):
+        validated_data['departamento'] = None
+    return validated_data
 
 class PropiedadSerializer(serializers.ModelSerializer):
-    direccion = DireccionSerializer()   
+    fotos = FotoPropiedadSerializer(many=True, read_only=True)
     class Meta:
         model = Propiedad
         fields = '__all__'  # incluye todos los campos del modelo
+        extra_fields = ['fotos']
     def validate_titulo(self, value):
-      if Propiedad.objects.filter(titulo=value).exists():
-        raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
-      return value
+        if Propiedad.objects.filter(titulo=value).exists():
+            raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
+        return value
     def create(self, validated_data):
-        direccion_data = validated_data.pop('direccion')
-        direccion = Direccion.objects.create(**direccion_data)
-        return Propiedad.objects.create(direccion=direccion, **validated_data)
+        request = self.context.get('request')
+        fotos_data = request.FILES.getlist('fotos') if request else []
+        validated_data = clean_direccion_fields(validated_data)
+        propiedad = Propiedad.objects.create(**validated_data)
+        for foto in fotos_data:
+            FotoPropiedad.objects.create(propiedad=propiedad, imagen=foto)
+        return propiedad
+
 class ViviendaSerializer(serializers.ModelSerializer):
-    direccion = DireccionSerializer()
+    fotos = FotoPropiedadSerializer(many=True, read_only=True)
     class Meta:
         model = Vivienda
         fields = '__all__'
+        extra_fields = ['fotos']
     def validate_titulo(self, value):
-      if Propiedad.objects.filter(titulo=value).exists():
-        raise serializers.ValidationError("Ya existe una propiedad con ese título.")
-      return value
+        if Propiedad.objects.filter(titulo=value).exists():
+            raise serializers.ValidationError("Ya existe una propiedad con ese título.")
+        return value
     def create(self, validated_data):
-      direccion_data = validated_data.pop('direccion')
-      direccion = Direccion.objects.create(**direccion_data)
-      # Asignamos la dirección manualmente antes de crear la vivienda
-      vivienda = Vivienda.objects.create(direccion=direccion, **validated_data)
-      return vivienda
+        request = self.context.get('request')
+        fotos_data = request.FILES.getlist('fotos') if request else []
+        validated_data = clean_direccion_fields(validated_data)
+        atributos = validated_data.get('atributos')
+        if isinstance(atributos, str):
+            try:
+                validated_data['atributos'] = json.loads(atributos)
+            except Exception:
+                validated_data['atributos'] = []
+        vivienda = Vivienda.objects.create(**validated_data)
+        for foto in fotos_data:
+            FotoPropiedad.objects.create(propiedad=vivienda, imagen=foto)
+        return vivienda
 
 class LocalComercialSerializer(serializers.ModelSerializer):
-    direccion = DireccionSerializer()
     metros_cuadrados = serializers.FloatField()
+    fotos = FotoPropiedadSerializer(many=True, read_only=True)
     class Meta:
         model = LocalComercial
         fields = '__all__'
+        extra_fields = ['fotos']
     def validate_titulo(self, value):
-      if Propiedad.objects.filter(titulo=value).exists():
-          raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
-      return value
+        if Propiedad.objects.filter(titulo=value).exists():
+            raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
+        return value
     def create(self, validated_data):
-      direccion_data = validated_data.pop('direccion')
-      direccion = Direccion.objects.create(**direccion_data)
-      return LocalComercial.objects.create(direccion=direccion, **validated_data)
+        request = self.context.get('request')
+        fotos_data = request.FILES.getlist('fotos') if request else []
+        validated_data = clean_direccion_fields(validated_data)
+        local = LocalComercial.objects.create(**validated_data)
+        for foto in fotos_data:
+            FotoPropiedad.objects.create(propiedad=local, imagen=foto)
+        return local
+
 class CocheraSerializer(serializers.ModelSerializer):
-    direccion = DireccionSerializer()
+    fotos = FotoPropiedadSerializer(many=True, read_only=True)
     class Meta:
         model = Cochera
         fields = '__all__'
+        extra_fields = ['fotos']
     def validate_titulo(self, value):
-      if Propiedad.objects.filter(titulo=value).exists():
-          raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
-      return value
+        if Propiedad.objects.filter(titulo=value).exists():
+            raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
+        return value
     def create(self, validated_data):
-      direccion_data = validated_data.pop('direccion')
-      direccion = Direccion.objects.create(**direccion_data)
-      return Cochera.objects.create(direccion=direccion, **validated_data)
+        request = self.context.get('request')
+        fotos_data = request.FILES.getlist('fotos') if request else []
+        validated_data = clean_direccion_fields(validated_data)
+        cochera = Cochera.objects.create(**validated_data)
+        for foto in fotos_data:
+            FotoPropiedad.objects.create(propiedad=cochera, imagen=foto)
+        return cochera
+
 class PoliticaSerializer(serializers.ModelSerializer):
   class Meta:
     model = Politica_De_Cancelacion

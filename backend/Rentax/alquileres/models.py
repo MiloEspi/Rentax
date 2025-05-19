@@ -10,4 +10,3 @@ class Alquiler(models.Model):
     cantidadDias=models.IntegerField()
     inquilino=models.ForeignKey(Usuario,on_delete=models.CASCADE)
     perteneceAPropiedad=models.ForeignKey(Propiedad,on_delete=models.CASCADE,null=True)
-
