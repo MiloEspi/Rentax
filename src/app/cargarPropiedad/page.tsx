@@ -215,7 +215,7 @@ export default function CargarPropiedad() {
     });
     // Agregar fotos
     form.fotos.forEach((file, idx) => {
-      formData.append('fotos', file);
+      formData.append('fotos []', file);
     });
 
     try {
