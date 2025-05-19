@@ -43,6 +43,17 @@ export const Navigation = () => {
                             About
                         </Link>
                     </li>
+                     {/* Botón "Ver mi perfil" solo visible para usuarios logueados */}
+                        {isLoggedIn && !isAdmin && (
+                            <li>
+                                <Link
+                                    href="/perfil"
+                                    className="text-black border border-gray-300 px-4 py-2 rounded hover:bg-gray-100"
+                                >
+                                    Ver mi perfil
+                                </Link>
+                            </li>
+                        )}
                     {/* Botón solo visible para admin */}
                     {isLoggedIn && isAdmin &&  (
                         <li>
@@ -82,8 +93,6 @@ export const Navigation = () => {
     <button
         className="text-white bg-red-500 border border-red-500 px-4 py-2 rounded hover:bg-red-600"
         onClick={() => {
-            localStorage.removeItem("isLoggedIn");
-            localStorage.removeItem("isAdmin"); // <-- Elimina el flag de admin
             setShowLogoutModal(true);
         }}
     >
@@ -106,6 +115,8 @@ export const Navigation = () => {
                                 className="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                                 onClick={() => {
                                     localStorage.removeItem("isLoggedIn");
+                                    localStorage.removeItem("isAdmin"); // <-- Elimina el flag de admin
+                                    localStorage.removeItem('userEmail');
                                     setShowLogoutModal(false);
                                     window.location.href = "/login";
                                 }}

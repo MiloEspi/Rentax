@@ -20,3 +20,5 @@ psycopg2-binary>=2.9.0
 
 # Utilidad general (opcional)
 python-dotenv>=1.0.0  # Para manejar variables de entorno
+
+Pillow 

@@ -29,7 +29,7 @@ class Propiedad(models.Model):
 class FotoPropiedad(models.Model):
     propiedad = models.ForeignKey(Propiedad, on_delete=models.CASCADE, related_name='fotos')
     imagen = models.ImageField(upload_to='propiedades/')
-    descripcion = models.CharField(max_length=200, blank=True)
+    descripcion = models.CharField(max_length=200, blank=True) 
 
 class Cochera(Propiedad):
     cupo_de_autos=models.IntegerField()
