@@ -16,10 +16,10 @@ class PropiedadDetailView(APIView):
             serializer = ViviendaSerializer(instancia, context={'request': request})
         elif tipo == "cochera":
             instancia = Cochera.objects.get(pk=pk)
-            serializer = CocheraSerializer(instancia)
+            serializer = CocheraSerializer(instancia, context={'request': request})
         elif tipo == "localcomercial":
             instancia = LocalComercial.objects.get(pk=pk)
-            serializer = LocalComercialSerializer(instancia)
+            serializer = LocalComercialSerializer(instancia, context={'request': request})
         else:
             return Response({"error": "Tipo de propiedad desconocido"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -34,14 +34,14 @@ class ViviendaCreateView(APIView):
 
 class CocheraCreateView(APIView):
     def post(self, request):
-        serializer = CocheraSerializer(data=request.data)
+        serializer = CocheraSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             cochera = serializer.save()
             return Response(CocheraSerializer(cochera).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class LocalCreateView(APIView):
     def post(self, request):
-        serializer = LocalComercialSerializer(data=request.data)
+        serializer = LocalComercialSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             local = serializer.save()
             return Response(LocalComercialSerializer(local).data, status=status.HTTP_201_CREATED)
