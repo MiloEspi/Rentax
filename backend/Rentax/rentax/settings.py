@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'rentax.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'alquilerexpress',
-        'USER': 'alquiler_user',
-        'PASSWORD': 'alquiler_pass',
+        'NAME': 'rentax',
+        'USER': 'rentax_user',
+        'PASSWORD': 'rentax_pass',
         'HOST': 'db',
         'PORT': '5432',
     }
