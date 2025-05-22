@@ -16,7 +16,7 @@ class PoliticaConReembolsoParcial(models.Model):
 class Propiedad(models.Model):
     titulo = models.TextField(max_length=400)
     calle = models.CharField(max_length=255)
-    numero = models.IntegerField()
+    numero = models.IntegerField(default=-1)
     piso = models.IntegerField(null=True, blank=True)
     departamento = models.CharField(max_length=10, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
@@ -30,7 +30,7 @@ class Propiedad(models.Model):
 class FotoPropiedad(models.Model):
     propiedad = models.ForeignKey(Propiedad, on_delete=models.CASCADE, related_name='fotos')
     imagen = models.ImageField(upload_to='propiedades/')
-    descripcion = models.CharField(max_length=200, blank=True)
+    descripcion = models.CharField(max_length=200, blank=True) 
 
 class Cochera(Propiedad):
     cupo_de_autos=models.IntegerField()

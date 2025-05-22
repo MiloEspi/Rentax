@@ -84,3 +84,55 @@ def validar_codigo_admin(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@csrf_exempt
+def perfil_usuario(request):
+    if request.method == 'POST':
+        # Lógica existente para obtener el perfil
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            if not email:
+                return JsonResponse({'success': False, 'error': 'Email requerido'}, status=400)
+            try:
+                persona = Persona.objects.get(email=email)
+                return JsonResponse({
+                    'success': True,
+                    'persona': {
+                        'nombre': persona.nombre,
+                        'apellido': persona.apellido,
+                        'email': persona.email,
+                        'fecha_nacimiento': str(persona.fecha_nacimiento),
+                        'sexo': persona.sexo,
+                        'dni': persona.dni,
+                    }
+                })
+            except Persona.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Error al cargar perfil'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    elif request.method == 'PUT':
+        # Nueva lógica para actualizar el perfil
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            if not email:
+                return JsonResponse({'success': False, 'error': 'Email requerido'}, status=400)
+            try:
+                persona = Persona.objects.get(email=email)
+                persona.nombre = data.get('nombre', persona.nombre)
+                persona.apellido = data.get('apellido', persona.apellido)
+                persona.fecha_nacimiento = data.get('fecha_nacimiento', persona.fecha_nacimiento)
+                persona.sexo = data.get('sexo', persona.sexo)
+                if 'password' in data and data['password']:
+                    persona.password = data['password']  # Considera encriptar la contraseña
+                persona.save()
+                return JsonResponse({'success': True, 'message': 'Perfil actualizado correctamente'})
+            except Persona.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Persona no encontrada'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)

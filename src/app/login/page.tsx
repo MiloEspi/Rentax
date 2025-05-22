@@ -31,6 +31,7 @@ export default function Login() {
 
             if (response.ok && data.success) {
                 localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userEmail', email);
                 window.location.href = '/';
             } else if (data.is_admin) {
                 localStorage.setItem('adminEmail', email);
