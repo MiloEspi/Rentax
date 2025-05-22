@@ -16,7 +16,7 @@ class PoliticaConReembolsoParcial(models.Model):
 class Propiedad(models.Model):
     titulo = models.TextField(max_length=400)
     calle = models.CharField(max_length=255)
-    numero = models.IntegerField()
+    numero = models.IntegerField(default=-1)
     piso = models.IntegerField(null=True, blank=True)
     departamento = models.CharField(max_length=10, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)

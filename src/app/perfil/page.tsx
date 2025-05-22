@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 
-
 const generos = [
     { value: '', label: 'Seleccionar' },
     { value: 'masculino', label: 'Masculino' },
@@ -22,128 +21,141 @@ const esMayorDeEdad = (fecha: string) => {
 };
 
 const PerfilPage = () => {
-  const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('');
+    const [user, setUser] = useState({
+        nombre: '',
+        apellido: '',
+        email: '',
+        fechaNacimiento: '',
+        genero: '',
+        dni: ''
+    });
+
+    const [originalUser, setOriginalUser] = useState(user);
+
+    const [editando, setEditando] = useState(false);
+    const [password, setPassword] = useState('');
+    const [errores, setErrores] = useState({ password: '', fechaNacimiento: '' });
+    const [successMsg, setSuccessMsg] = useState('');
+
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-    const storedEmail = localStorage.getItem('userEmail');
-    if (storedEmail) setEmail(storedEmail);
+        const storedEmail = localStorage.getItem('userEmail');
+        if (storedEmail) {
+            setEmail(storedEmail);
+            setUser(u => ({ ...u, email: storedEmail }));
+        }
     }, []);
 
-  const [user, setUser] = useState({
-    nombre: '',
-    apellido: '',
-    email: email || '',
-    fechaNacimiento: '',
-    genero: '',
-    dni:''
-  });
-
-  const [editando, setEditando] = useState(false);
-  const [password, setPassword] = useState('');
-  const [errores, setErrores] = useState({ password: '', fechaNacimiento: '' });
-
-   const [loading, setLoading] = useState(true);
-
-const cargarPerfil = (email: string) => {
-    setLoading(true);
-    fetch('http://localhost:8000/perfil/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-    })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                const persona = data.persona;
-                setUser({
-                    nombre: persona.nombre,
-                    apellido: persona.apellido,
-                    email: persona.email,
-                    fechaNacimiento: persona.fecha_nacimiento,
-                    genero: persona.sexo,
-                    dni: persona.dni
-                });
-            } else {
-                alert('No se pudo cargar el perfil');
-            }
-            setLoading(false);
+    const cargarPerfil = (email: string) => {
+        setLoading(true);
+        fetch('http://localhost:8000/perfil/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
         })
-        .catch(error => {
-            console.error('Error al cargar el perfil:', error);
-            setLoading(false);
-        });
-};
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const persona = data.persona;
+                    let genero = '';
+                    if (['masculino', 'femenino', 'otro'].includes((persona.sexo || '').toLowerCase())) {
+                        genero = persona.sexo.toLowerCase();
+                    }
+                    const newUser = {
+                        nombre: persona.nombre,
+                        apellido: persona.apellido,
+                        email: persona.email,
+                        fechaNacimiento: persona.fecha_nacimiento,
+                        genero: genero,
+                        dni: persona.dni
+                    };
+                    setUser(newUser);
+                    setOriginalUser(newUser);
+                } else {
+                    alert('No se pudo cargar el perfil');
+                }
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Error al cargar el perfil:', error);
+                setLoading(false);
+            });
+    };
 
-useEffect(() => {
-    if (email) cargarPerfil(email);
+    useEffect(() => {
+        if (email) cargarPerfil(email);
     }, [email]);
-
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
     };
 
-    const handleEdit = () => setEditando(true);
+    const handleEdit = () => {
+        setOriginalUser(user);
+        setEditando(true);
+    };
 
     const handleCancel = () => {
+        setUser(originalUser);
         setEditando(false);
         setPassword('');
         setErrores({ password: '', fechaNacimiento: '' });
     };
 
     const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    let valid = true;
-    let passwordError = '';
-    let fechaNacimientoError = '';
+        e.preventDefault();
+        let valid = true;
+        let passwordError = '';
+        let fechaNacimientoError = '';
 
-    if (password && password.length < 8) {
-        passwordError = 'La contraseña debe tener al menos 8 caracteres.';
-        valid = false;
-    }
-    if (!esMayorDeEdad(user.fechaNacimiento)) {
-        fechaNacimientoError = 'Debes ser mayor de 18 años.';
-        valid = false;
-    }
+        if (password && password.length < 8) {
+            passwordError = 'La contraseña debe tener al menos 8 caracteres.';
+            valid = false;
+        }
+        if (!esMayorDeEdad(user.fechaNacimiento)) {
+            fechaNacimientoError = 'Debes ser mayor de 18 años.';
+            valid = false;
+        }
 
-    setErrores({ password: passwordError, fechaNacimiento: fechaNacimientoError });
+        setErrores({ password: passwordError, fechaNacimiento: fechaNacimientoError });
 
-    if (!valid) return;
+        if (!valid) return;
 
-    // Realizar la solicitud PUT al backend
-    fetch('http://localhost:8000/perfil/', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            email: user.email,
-            nombre: user.nombre,
-            apellido: user.apellido,
-            fecha_nacimiento: user.fechaNacimiento,
-            sexo: user.genero,
-            password: password,
-        }),
-    })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                setEditando(true);
-                setPassword('');
-                alert('Perfil actualizado correctamente');
-                cargarPerfil(user.email); // <-- Vuelve a cargar los datos actualizados
-            } else {
-                alert('Error al actualizar el perfil: ' + data.error);
-            }
+        fetch('http://localhost:8000/perfil/', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: user.email,
+                nombre: user.nombre,
+                apellido: user.apellido,
+                fecha_nacimiento: user.fechaNacimiento,
+                sexo: user.genero,
+                password: password,
+            }),
         })
-        .catch(error => {
-            console.error('Error al actualizar el perfil:', error);
-            alert('Error al actualizar el perfil');
-        });
-};
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    setEditando(false);
+                    setPassword('');
+                    setSuccessMsg('Perfil actualizado correctamente');
+                    cargarPerfil(user.email);
+                    setTimeout(() => setSuccessMsg(''), 3000);
+                } else {
+                    alert('Error al actualizar el perfil: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error al actualizar el perfil:', error);
+                alert('Error al actualizar el perfil');
+            });
+    };
 
-if (loading) return <p>Cargando perfil...</p>;
+    if (loading) return <p>Cargando perfil...</p>;
 
     return (
-        
         <div style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)',
@@ -170,6 +182,21 @@ if (loading) return <p>Cargando perfil...</p>;
                 }}>
                     Mi Perfil
                 </h2>
+                {successMsg && (
+                    <div style={{
+                        color: '#22c55e',
+                        background: '#dcfce7',
+                        border: '1px solid #bbf7d0',
+                        borderRadius: 8,
+                        padding: '12px 24px',
+                        marginBottom: 20,
+                        fontWeight: 600,
+                        fontSize: 16,
+                        textAlign: 'center'
+                    }}>
+                        {successMsg}
+                    </div>
+                )}
                 <form onSubmit={handleSave} style={{ width: '100%' }}>
                     <div style={{ display: 'flex', gap: 24, marginBottom: 20 }}>
                         <div style={{ flex: 1 }}>
@@ -319,25 +346,7 @@ if (loading) return <p>Cargando perfil...</p>;
                         )}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
-                        {!editando ? (
-                            <button
-                                type="button"
-                                onClick={handleEdit}
-                                style={{
-                                    padding: '10px 32px',
-                                    background: '#6366f1',
-                                    color: '#fff',
-                                    border: 'none',
-                                    borderRadius: 8,
-                                    fontWeight: 600,
-                                    fontSize: 16,
-                                    cursor: 'pointer',
-                                    boxShadow: '0 2px 8px #c7d2fe',
-                                }}
-                            >
-                                Editar
-                            </button>
-                        ) : (
+                        {editando ? (
                             <>
                                 <button
                                     type="submit"
@@ -373,9 +382,55 @@ if (loading) return <p>Cargando perfil...</p>;
                                     Cancelar
                                 </button>
                             </>
-                        )}
+                        ) : null}
                     </div>
                 </form>
+                {!editando && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                        <button
+                            type="button"
+                            onClick={handleEdit}
+                            style={{
+                                padding: '10px 32px',
+                                background: '#6366f1',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 8,
+                                fontWeight: 600,
+                                fontSize: 16,
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 8px #c7d2fe',
+                            }}
+                        >
+                            Editar
+                        </button>
+                    </div>
+                )}
+                {/* Botón "Ver mis alquileres" */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32 }}>
+                    <button
+                        type="button"
+                        onClick={() => window.location.href = '/misAlquileres'}
+                        style={{
+                            padding: '12px 36px',
+                            background: '#22d3ee',
+                            color: '#0f172a',
+                            border: 'none',
+                            borderRadius: 8,
+                            fontWeight: 700,
+                            fontSize: 18,
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 8px #bae6fd',
+                            letterSpacing: 1,
+                            transition: 'background 0.2s',
+                        }}
+                        onMouseOver={e => (e.currentTarget.style.background = '#06b6d4')}
+                        onMouseOut={e => (e.currentTarget.style.background = '#22d3ee')}
+                    >
+                        Ver mis alquileres
+                    </button>
+                </div>
+
             </div>
         </div>
     );
