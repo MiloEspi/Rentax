@@ -24,7 +24,9 @@ const RENTAX_LIGHT_RED = '#ffe6e0';
 const RENTAX_GRAY = '#f5f6fa';
 const RENTAX_DARK_GRAY = '#e3e4ea';
 
-export default function PrimerPropiedad({ params }: { params: { id: string } }) {
+export default function PrimerPropiedad({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = React.use(params);
+
     const [property, setProperty] = React.useState<Property | null>(null);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
@@ -47,13 +49,13 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
     React.useEffect(() => {
         setLoading(true);
         setError(null);
-        fetch(`http://localhost:8000/propiedades/${params.id}/`)
+        fetch(`http://localhost:8000/propiedades/${id}/`)
             .then(async res => {
                 if (!res.ok) throw new Error('No se pudo cargar la propiedad');
                 const data = await res.json();
                 // Adaptar campos del backend a los del frontend
                 setProperty({
-                    id: data.id?.toString() ?? params.id,
+                    id: data.id?.toString() ?? id,
                     title: data.titulo ?? data.title ?? '',
                     description: data.descripcion ?? '',
                     mainImage: data.fotos?.[0]?.imagen ?? undefined,
@@ -70,7 +72,7 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
             })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
-    }, [params.id]);
+    }, [id]);
 
     function averageRating(reviews: Review[]) {
         if (!reviews.length) return 0;
