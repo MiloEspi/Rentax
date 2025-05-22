@@ -28,9 +28,9 @@ def login_view(request):
                         # Usuario normal, iniciar sesión
                         return JsonResponse({'success': True, 'is_admin': False})
                 else:
-                    return JsonResponse({'success': False, 'error': 'Credenciales incorrectas'}, status=400)
+                    return JsonResponse({'success': False, 'error': 'La contraseña no coincide con el mail'}, status=400)
             except Persona.DoesNotExist:
-                return JsonResponse({'success': False, 'error': 'Usuario no encontrado'}, status=400)
+                return JsonResponse({'success': False, 'error': 'Correo ingresado no encontrado'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
