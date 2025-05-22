@@ -1,28 +1,10 @@
 'use client';
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export const Navigation = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
-
-    const [showAdminMenu, setShowAdminMenu] = useState(false);
-    const adminMenuRef = useRef<HTMLLIElement>(null);
-
-    // Cierra el menú si se hace click fuera
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (adminMenuRef.current && !adminMenuRef.current.contains(event.target as Node)) {
-                setShowAdminMenu(false);
-            }
-        }
-        if (showAdminMenu) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [showAdminMenu]);
 
     // Chequea el estado al montar y cuando cambia el storage
     useEffect(() => {
@@ -71,55 +53,15 @@ export const Navigation = () => {
                             </Link>
                         </li>
                     )}
-                    {/* Menú de opciones para admin */}
+                    {/* Botón "Listar Propiedades" solo para admin */}
                     {isLoggedIn && isAdmin && (
-                        <li className="relative" ref={adminMenuRef}>
-                            <button
-                                className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-700 text-white focus:outline-none"
-                                onClick={() => setShowAdminMenu((v) => !v)}
-                                aria-label="Opciones de administrador"
-                                type="button"
+                        <li>
+                            <Link
+                                href="/listarPropiedades"
+                                className="text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
                             >
-                                {/* Icono de tres puntos verticales */}
-                                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2"
-                                    strokeLinecap="round" strokeLinejoin="round" className="feather feather-more-vertical">
-                                    <circle cx="12" cy="5" r="1" />
-                                    <circle cx="12" cy="12" r="1" />
-                                    <circle cx="12" cy="19" r="1" />
-                                </svg>
-                            </button>
-                            {showAdminMenu && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow-lg z-50">
-                                    <Link
-                                        href="/cargarPropiedad"
-                                        className="block px-4 py-2 text-gray-800 hover:bg-purple-100 hover:text-purple-700"
-                                        onClick={() => setShowAdminMenu(false)}
-                                    >
-                                        Cargar Propiedad
-                                    </Link>
-                                    <Link
-                                        href="/modificarPropiedad"
-                                        className="block px-4 py-2 text-gray-800 hover:bg-purple-100 hover:text-purple-700"
-                                        onClick={() => setShowAdminMenu(false)}
-                                    >
-                                        Modificar Propiedad
-                                    </Link>
-                                    <Link
-                                        href="/eliminarPropiedad"
-                                        className="block px-4 py-2 text-gray-800 hover:bg-purple-100 hover:text-purple-700"
-                                        onClick={() => setShowAdminMenu(false)}
-                                    >
-                                        Eliminar Propiedad
-                                    </Link>
-                                    <Link
-                                        href="/buscarAlquileres"
-                                        className="block px-4 py-2 text-gray-800 hover:bg-purple-100 hover:text-purple-700"
-                                        onClick={() => setShowAdminMenu(false)}
-                                    >
-                                        Buscar Alquileres
-                                    </Link>
-                                </div>
-                            )}
+                                Listar Propiedades
+                            </Link>
                         </li>
                     )}
                 </div>

@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import Propiedad, Politica_De_Cancelacion, Localidad, LocalComercial, Cochera, Vivienda
-from .serializers import PropiedadSerializer, PoliticaSerializer, LocalidadSerializer, ViviendaSerializer, CocheraSerializer, LocalComercialSerializer, PoliticaSinReembolsoSerializer, PoliticaConReembolsoCompletoSerializer, PoliticaConReembolsoParcialSerializer
+from .models import Propiedad, Politica_De_Cancelacion, Localidad, LocalComercial, Cochera, Vivienda,FotoPropiedad
+from .serializers import PropiedadSerializer, PoliticaSerializer, FotoPropiedadSerializer,LocalidadSerializer, ViviendaSerializer, CocheraSerializer, LocalComercialSerializer, PoliticaSinReembolsoSerializer, PoliticaConReembolsoCompletoSerializer, PoliticaConReembolsoParcialSerializer
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
  
@@ -24,6 +24,49 @@ class PropiedadDetailView(APIView):
             return Response({"error": "Tipo de propiedad desconocido"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_200_OK)
  
+    def put(self, request, pk):
+        propiedad = get_object_or_404(Propiedad, pk=pk)
+        tipo = propiedad.tipoPropiedad.lower()
+        # Selecciona el modelo y serializer correcto
+        if tipo == "vivienda":
+            instancia = Vivienda.objects.get(pk=pk)
+            serializer_class = ViviendaSerializer
+        elif tipo == "cochera":
+            instancia = Cochera.objects.get(pk=pk)
+            serializer_class = CocheraSerializer
+        elif tipo == "localcomercial":
+            instancia = LocalComercial.objects.get(pk=pk)
+            serializer_class = LocalComercialSerializer
+        else:
+            return Response({"error": "Tipo de propiedad desconocido"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Actualiza campos
+        serializer = serializer_class(instancia, data=request.data, context={'request': request}, partial=True)
+        if serializer.is_valid():
+            propiedad_actualizada = serializer.save()
+
+            # --- Manejo de fotos ---
+            # 1. Mantener solo las fotos cuyo id está en fotos_existentes
+            fotos_existentes_ids = request.data.getlist('fotos_existentes')
+            if fotos_existentes_ids:
+                fotos_existentes_ids = [int(fid) for fid in fotos_existentes_ids]
+                # Elimina las fotos que no están en la lista
+                for foto in propiedad.fotos.all():
+                    if foto.id not in fotos_existentes_ids:
+                        foto.delete()
+            else:
+                # Si no se envía nada, elimina todas
+                propiedad.fotos.all().delete()
+
+            # 2. Agregar nuevas fotos
+            for foto_file in request.FILES.getlist('fotos'):
+                FotoPropiedad.objects.create(propiedad=propiedad, imagen=foto_file)
+
+            # Serializa y devuelve la propiedad actualizada
+            serializer = serializer_class(instancia, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class ViviendaCreateView(APIView):
     def post(self, request):
         serializer = ViviendaSerializer(data=request.data, context={'request': request})
@@ -102,11 +145,11 @@ class LocalidadListView(APIView):
 class PropiedadListCreateView(APIView):
     def get(self, request):
         propiedades = Propiedad.objects.all()
-        serializer = PropiedadSerializer(propiedades, many=True)
+        serializer = PropiedadSerializer(propiedades, many=True, context={'request': request})  # <--- agrega context
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = PropiedadSerializer(data=request.data)
+        serializer = PropiedadSerializer(data=request.data, context={'request': request})  # <--- agrega context
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
