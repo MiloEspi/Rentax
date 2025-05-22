@@ -252,6 +252,8 @@ export default function CargarPropiedad() {
           fileInputRef.current.value = '';
         }
         setFotoPreviews([]);
+        // Redirigir a listarPropiedades
+        window.location.href = '/listarPropiedades';
       } else {
         // Intenta parsear la respuesta como JSON, si es posible
         let errorMsg = 'Error al registrar la propiedad';

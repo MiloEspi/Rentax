@@ -13,6 +13,7 @@ from .views import (
     LocalCreateView,
     PropiedadDetailView,
 )
+from . import views
 
 urlpatterns = [
     path('propiedades/', PropiedadListCreateView.as_view(), name='propiedad-list-create'),
@@ -26,5 +27,7 @@ urlpatterns = [
     path('local/', LocalCreateView.as_view(), name='local-create'),
     path('propiedades/<int:pk>/', PropiedadDetailView.as_view()),
     path('propiedades/<int:pk>/', PropiedadDetailView.as_view(), name='propiedad-detail'),
-
+    path('departamentos/<int:id>/', views.modificar_departamento),
+    path('casas/<int:id>/', views.modificar_casa),
+    path('oficinas/<int:id>/', views.modificar_oficina),
 ]

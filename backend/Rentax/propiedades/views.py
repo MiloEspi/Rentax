@@ -5,6 +5,7 @@ from .models import Propiedad, Politica_De_Cancelacion, Localidad, LocalComercia
 from .serializers import PropiedadSerializer, PoliticaSerializer, FotoPropiedadSerializer,LocalidadSerializer, ViviendaSerializer, CocheraSerializer, LocalComercialSerializer, PoliticaSinReembolsoSerializer, PoliticaConReembolsoCompletoSerializer, PoliticaConReembolsoParcialSerializer
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
  
 
 class PropiedadDetailView(APIView):
@@ -17,7 +18,7 @@ class PropiedadDetailView(APIView):
         elif tipo == "cochera":
             instancia = Cochera.objects.get(pk=pk)
             serializer = CocheraSerializer(instancia, context={'request': request})
-        elif tipo == "localcomercial":
+        elif tipo == "local":
             instancia = LocalComercial.objects.get(pk=pk)
             serializer = LocalComercialSerializer(instancia, context={'request': request})
         else:
@@ -34,7 +35,7 @@ class PropiedadDetailView(APIView):
         elif tipo == "cochera":
             instancia = Cochera.objects.get(pk=pk)
             serializer_class = CocheraSerializer
-        elif tipo == "localcomercial":
+        elif tipo == "local":
             instancia = LocalComercial.objects.get(pk=pk)
             serializer_class = LocalComercialSerializer
         else:
@@ -154,3 +155,21 @@ class PropiedadListCreateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+def modificar_departamento(request, id):
+    # Lógica para actualizar solo campos de Departamento
+    # ...tu código aquí...
+    return Response(...)
+
+@api_view(['PUT'])
+def modificar_casa(request, id):
+    # Lógica para actualizar solo campos de Casa
+    # ...tu código aquí...
+    return Response(...)
+
+@api_view(['PUT'])
+def modificar_oficina(request, id):
+    # Lógica para actualizar solo campos de Oficina
+    # ...tu código aquí...
+    return Response(...)

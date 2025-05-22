@@ -16,6 +16,7 @@ type Property = {
     precio?: number | string;
     reviews?: Review[];
     questions?: Question[];
+    metros_cuadrados?: number;
     // ...otros campos posibles...
 };
 
@@ -66,7 +67,7 @@ export default function PrimerPropiedad({ params }: { params: Promise<{ id: stri
                     precio: data.precio,
                     reviews: [], // Si tienes reviews en backend, cámbialo aquí
                     questions: [], // Si tienes preguntas en backend, cámbialo aquí
-                    // ...otros campos...
+                    metros_cuadrados: data.metros_cuadrados,
                 });
                 setQuestions([]); // Si tienes preguntas en backend, cámbialo aquí
             })
