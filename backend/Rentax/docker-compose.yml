@@ -7,9 +7,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      POSTGRES_DB: alquilerexpress
-      POSTGRES_USER: alquiler_user
-      POSTGRES_PASSWORD: alquiler_pass
+      POSTGRES_DB: rentax
+      POSTGRES_USER: rentax_user
+      POSTGRES_PASSWORD: rentax_pass
     ports:
       - "5432:5432"
 
@@ -25,9 +25,9 @@ services:
     environment:
       - DEBUG=True
       - SECRET_KEY=sup3rs3cr3t
-      - DB_NAME=alquilerexpress
-      - DB_USER=alquiler_user
-      - DB_PASSWORD=alquiler_pass
+      - DB_NAME=rentax
+      - DB_USER=rentax_user
+      - DB_PASSWORD=rentax_pass
       - DB_HOST=db
       - DB_PORT=5432
 

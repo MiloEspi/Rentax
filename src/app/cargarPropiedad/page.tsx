@@ -163,17 +163,20 @@ export default function CargarPropiedad() {
         ambientes: form.ambientes,
         huespedes: form.huespedes,
         banios: form.banios,
-        atributos: JSON.stringify(form.atributos), // serializar array
+        atributos: JSON.stringify(form.atributos), 
+        tipoPropiedad:'vivienda',
       };
     } else if (form.categoria === 'cochera') {
       url = 'http://localhost:8000/cocheras/';
       categoriaPayload = {
         cupo_de_autos: 1,
+        tipoPropiedad: 'cochera',
       };
     } else if (form.categoria === 'local') {
       url = 'http://localhost:8000/local/';
       categoriaPayload = {
         metros_cuadrados: form.metros_cuadrados,
+        tipoPropiedad:'local',
       };
     }
 

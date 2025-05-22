@@ -23,6 +23,7 @@ class Propiedad(models.Model):
     descripcion = models.TextField()
     politica=models.ForeignKey(Politica_De_Cancelacion,on_delete=models.SET_NULL, null=True)
     localidad=models.ForeignKey(Localidad,on_delete=models.CASCADE, null=True)
+    tipoPropiedad=models.CharField(max_length=20)
     def __str__(self):
         return self.titulo 
 

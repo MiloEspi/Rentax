@@ -3,9 +3,17 @@ from .models import Propiedad, Politica_De_Cancelacion, Localidad, Vivienda, Loc
 import json
 
 class FotoPropiedadSerializer(serializers.ModelSerializer):
+    imagen = serializers.SerializerMethodField()
+
     class Meta:
         model = FotoPropiedad
         fields = ['id', 'imagen', 'descripcion']
+
+    def get_imagen(self, obj):
+        request = self.context.get('request')
+        if request is not None:
+            return request.build_absolute_uri(obj.imagen.url)
+        return obj.imagen.url
 
 def clean_direccion_fields(validated_data):
     # Convierte '' a None y castea a int si corresponde
@@ -54,7 +62,10 @@ class ViviendaSerializer(serializers.ModelSerializer):
         return value
     def create(self, validated_data):
         request = self.context.get('request')
+        print("REQUEST:", request)
+        print("FILES:", request.FILES if request else "NO REQUEST")
         fotos_data = request.FILES.getlist('fotos') if request else []
+        print("FOTOS_DATA:", fotos_data)
         validated_data = clean_direccion_fields(validated_data)
         atributos = validated_data.get('atributos')
         if isinstance(atributos, str):
@@ -63,8 +74,9 @@ class ViviendaSerializer(serializers.ModelSerializer):
             except Exception:
                 validated_data['atributos'] = []
         vivienda = Vivienda.objects.create(**validated_data)
+        propiedad_base = Propiedad.objects.get(pk=vivienda.pk)
         for foto in fotos_data:
-            FotoPropiedad.objects.create(propiedad=vivienda, imagen=foto)
+            FotoPropiedad.objects.create(propiedad=propiedad_base, imagen=foto)
         return vivienda
 
 class LocalComercialSerializer(serializers.ModelSerializer):
@@ -83,8 +95,9 @@ class LocalComercialSerializer(serializers.ModelSerializer):
         fotos_data = request.FILES.getlist('fotos') if request else []
         validated_data = clean_direccion_fields(validated_data)
         local = LocalComercial.objects.create(**validated_data)
+        propiedad_base = Propiedad.objects.get(pk=local.pk)
         for foto in fotos_data:
-            FotoPropiedad.objects.create(propiedad=local, imagen=foto)
+            FotoPropiedad.objects.create(propiedad=propiedad_base, imagen=foto)
         return local
 
 class CocheraSerializer(serializers.ModelSerializer):
@@ -102,8 +115,9 @@ class CocheraSerializer(serializers.ModelSerializer):
         fotos_data = request.FILES.getlist('fotos') if request else []
         validated_data = clean_direccion_fields(validated_data)
         cochera = Cochera.objects.create(**validated_data)
+        propiedad_base = Propiedad.objects.get(pk=cochera.pk)
         for foto in fotos_data:
-            FotoPropiedad.objects.create(propiedad=cochera, imagen=foto)
+            FotoPropiedad.objects.create(propiedad=propiedad_base, imagen=foto)
         return cochera
 
 class PoliticaSerializer(serializers.ModelSerializer):

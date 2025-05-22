@@ -8,13 +8,15 @@ type Property = {
     id: string;
     title: string;
     description: string;
-    mainImage: string;
-    images: string[];
-    ambientes: number;
-    huespedes: number;
-    banios: number;
-    reviews: Review[];
+    mainImage?: string;
+    images?: string[];
+    ambientes?: number;
+    huespedes?: number;
+    banios?: number;
+    precio?: number | string;
+    reviews?: Review[];
     questions?: Question[];
+    // ...otros campos posibles...
 };
 
 const RENTAX_RED = '#FF5722';
@@ -22,425 +24,10 @@ const RENTAX_LIGHT_RED = '#ffe6e0';
 const RENTAX_GRAY = '#f5f6fa';
 const RENTAX_DARK_GRAY = '#e3e4ea';
 
-const mockProperty: Property = {
-    id: '1',
-    title: 'Moderno Departamento en el Centro',
-    description:
-        'Luminoso departamento totalmente equipado, ideal para familias o grupos de amigos. Excelente ubicación y comodidades.',
-    mainImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-    images: [
-        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80',
-    ],
-    ambientes: 3,
-    huespedes: 4,
-    banios: 2,
-    reviews: [
-        { user: 'Ana', comment: 'Excelente lugar, muy cómodo.', rating: 5 },
-        { user: 'Luis', comment: 'Buena ubicación y limpio.', rating: 4 },
-        { user: 'Pedro', comment: 'Todo perfecto.', rating: 5 },
-        { user: 'Sofía', comment: 'Podría estar más limpio.', rating: 3 },
-        { user: 'Juan', comment: 'Muy recomendable.', rating: 4 },
-        { user: 'Lucía', comment: 'Hermoso departamento.', rating: 5 },
-        { user: 'Carlos', comment: 'Ruidoso por la noche.', rating: 2 },
-    ],
-    questions: [
-        { user: 'María', question: '¿Se aceptan mascotas?', response: 'Sí, aceptamos mascotas pequeñas.' },
-        { user: 'Pedro', question: '¿Hay estacionamiento disponible?' },
-        { user: 'Ana', question: '¿El wifi es rápido?', response: 'Sí, tenemos fibra óptica de alta velocidad.' },
-    ],
-};
-
-function averageRating(reviews: Review[]) {
-    if (!reviews.length) return 0;
-    return (
-        reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-    );
-}
-
-function ratingDistribution(reviews: Review[]) {
-    const dist = [0, 0, 0, 0, 0];
-    reviews.forEach(r => {
-        dist[r.rating - 1]++;
-    });
-    return dist;
-}
-
-function ArrowButton({
-    direction,
-    onClick,
-    style = {},
-    size = 44,
-    ariaLabel,
-}: {
-    direction: 'left' | 'right';
-    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    style?: React.CSSProperties;
-    size?: number;
-    ariaLabel?: string;
-}) {
-    return (
-        <button
-            onClick={onClick}
-            style={{
-                position: 'absolute',
-                top: '50%',
-                [direction === 'left' ? 'left' : 'right']: -size / 1.2,
-                transform: 'translateY(-50%)',
-                background: '#fff',
-                border: `2.5px solid ${RENTAX_RED}`,
-                borderRadius: '50%',
-                width: size,
-                height: size,
-                fontSize: size * 0.65,
-                color: RENTAX_RED,
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px #ff572233',
-                zIndex: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                ...style,
-            }}
-            aria-label={ariaLabel}
-        >
-            {direction === 'left' ? '‹' : '›'}
-        </button>
-    );
-}
-
-function ImageModal({
-    src,
-    onClose,
-    onPrev,
-    onNext,
-}: {
-    src: string;
-    onClose: () => void;
-    onPrev: () => void;
-    onNext: () => void;
-}) {
-    React.useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
-            if (e.key === 'ArrowLeft') onPrev();
-            if (e.key === 'ArrowRight') onNext();
-        };
-        window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
-    }, [onClose, onPrev, onNext]);
-    return (
-        <div
-            onClick={onClose}
-            style={{
-                position: 'fixed',
-                top: 0, left: 0, right: 0, bottom: 0,
-                background: 'rgba(30,30,30,0.85)',
-                zIndex: 1000,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}
-        >
-            <div style={{ position: 'relative', maxWidth: '92vw', maxHeight: '88vh' }}>
-                <ArrowButton direction="left" onClick={e => { e.stopPropagation(); onPrev(); }} ariaLabel="Anterior" size={54} style={{ left: -60, background: RENTAX_LIGHT_RED }} />
-                <img
-                    src={src}
-                    alt="Vista grande"
-                    style={{
-                        maxWidth: '90vw',
-                        maxHeight: '85vh',
-                        borderRadius: 22,
-                        boxShadow: '0 8px 32px #0008',
-                        background: '#fff',
-                        padding: 16,
-                        border: `3px solid ${RENTAX_RED}`,
-                        display: 'block',
-                    }}
-                    onClick={e => e.stopPropagation()}
-                />
-                <ArrowButton direction="right" onClick={e => { e.stopPropagation(); onNext(); }} ariaLabel="Siguiente" size={54} style={{ right: -60, background: RENTAX_LIGHT_RED }} />
-            </div>
-        </div>
-    );
-}
-
-function Calendar({
-    value,
-    onChange,
-    onClose,
-    minDate,
-    maxDate,
-}: {
-    value: Date | null;
-    onChange: (date: Date) => void;
-    onClose: () => void;
-    minDate?: Date;
-    maxDate?: Date;
-}) {
-    const [current, setCurrent] = React.useState(() => {
-        const d = value || new Date();
-        return new Date(d.getFullYear(), d.getMonth(), 1);
-    });
-
-    React.useEffect(() => {
-        function handleClick(e: MouseEvent) {
-            if (!(e.target as HTMLElement).closest('.calendar-popup')) {
-                onClose();
-            }
-        }
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
-    }, [onClose]);
-
-    const daysInMonth = (year: number, month: number) =>
-        new Date(year, month + 1, 0).getDate();
-
-    const handleSelect = (day: number) => {
-        const date = new Date(current.getFullYear(), current.getMonth(), day);
-        if (
-            (minDate && date < minDate) ||
-            (maxDate && date > maxDate)
-        ) return;
-        onChange(date);
-        onClose();
-    };
-
-    const days = [];
-    const firstDay = new Date(current.getFullYear(), current.getMonth(), 1).getDay();
-    for (let i = 0; i < firstDay; i++) days.push(null);
-    for (let d = 1; d <= daysInMonth(current.getFullYear(), current.getMonth()); d++) {
-        days.push(d);
-    }
-
-    return (
-        <div
-            className="calendar-popup"
-            style={{
-                position: 'absolute',
-                top: 48,
-                left: 0,
-                zIndex: 10,
-                background: '#fff',
-                border: `2px solid ${RENTAX_RED}`,
-                borderRadius: 12,
-                boxShadow: '0 4px 24px #0003',
-                padding: 18,
-                width: 270,
-            }}
-        >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <button
-                    onClick={() =>
-                        setCurrent(
-                            new Date(current.getFullYear(), current.getMonth() - 1, 1)
-                        )
-                    }
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        fontSize: 22,
-                        cursor: 'pointer',
-                        color: RENTAX_RED,
-                        fontWeight: 700,
-                    }}
-                >
-                    ‹
-                </button>
-                <span style={{ fontWeight: 700, color: RENTAX_RED }}>
-                    {current.toLocaleString('es-ES', {
-                        month: 'long',
-                        year: 'numeric',
-                    })}
-                </span>
-                <button
-                    onClick={() =>
-                        setCurrent(
-                            new Date(current.getFullYear(), current.getMonth() + 1, 1)
-                        )
-                    }
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        fontSize: 22,
-                        cursor: 'pointer',
-                        color: RENTAX_RED,
-                        fontWeight: 700,
-                    }}
-                >
-                    ›
-                </button>
-            </div>
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(7, 1fr)',
-                    gap: 4,
-                    marginBottom: 4,
-                    fontSize: 15,
-                    color: RENTAX_RED,
-                    fontWeight: 700,
-                    letterSpacing: 1,
-                }}
-            >
-                {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d) => (
-                    <div key={d} style={{ textAlign: 'center' }}>
-                        {d}
-                    </div>
-                ))}
-            </div>
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(7, 1fr)',
-                    gap: 4,
-                }}
-            >
-                {days.map((d, i) =>
-                    d ? (
-                        <button
-                            key={i}
-                            onClick={() => handleSelect(d)}
-                            disabled={
-                                (minDate && new Date(current.getFullYear(), current.getMonth(), d) < minDate) ||
-                                (maxDate && new Date(current.getFullYear(), current.getMonth(), d) > maxDate)
-                            }
-                            style={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: 8,
-                                border: value &&
-                                    value.getDate() === d &&
-                                    value.getMonth() === current.getMonth() &&
-                                    value.getFullYear() === current.getFullYear()
-                                    ? `2.5px solid ${RENTAX_RED}`
-                                    : '1.5px solid #e0e0e0',
-                                background:
-                                    value &&
-                                    value.getDate() === d &&
-                                    value.getMonth() === current.getMonth() &&
-                                    value.getFullYear() === current.getFullYear()
-                                        ? RENTAX_LIGHT_RED
-                                        : '#fafafa',
-                                color: '#222',
-                                cursor: 'pointer',
-                                fontWeight: 600,
-                                opacity:
-                                    (minDate && new Date(current.getFullYear(), current.getMonth(), d) < minDate) ||
-                                    (maxDate && new Date(current.getFullYear(), current.getMonth(), d) > maxDate)
-                                        ? 0.4
-                                        : 1,
-                            }}
-                        >
-                            {d}
-                        </button>
-                    ) : (
-                        <div key={i} />
-                    )
-                )}
-            </div>
-        </div>
-    );
-}
-
-function DateSelector({
-    label,
-    value,
-    onChange,
-    minDate,
-    maxDate,
-    open,
-    setOpen,
-}: {
-    label: string;
-    value: Date | null;
-    onChange: (date: Date) => void;
-    minDate?: Date;
-    maxDate?: Date;
-    open: boolean;
-    setOpen: (open: boolean) => void;
-}) {
-    return (
-        <div style={{ position: 'relative', marginBottom: 0 }}>
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: `linear-gradient(135deg, #fff 60%, ${RENTAX_LIGHT_RED} 100%)`,
-                    border: `2.5px solid ${RENTAX_RED}`,
-                    borderRadius: 12,
-                    padding: '14px 18px',
-                    boxShadow: '0 2px 8px #0001',
-                    minWidth: 220,
-                    cursor: 'pointer',
-                    gap: 16,
-                    fontWeight: 700,
-                }}
-                onClick={() => setOpen(true)}
-            >
-                <div
-                    style={{
-                        background: RENTAX_RED,
-                        color: '#fff',
-                        borderRadius: 8,
-                        padding: '8px 18px',
-                        fontWeight: 800,
-                        fontSize: 16,
-                        letterSpacing: 1,
-                        boxShadow: '0 1px 4px #0002',
-                        marginRight: 12,
-                        minWidth: 70,
-                        textAlign: 'center',
-                    }}
-                >
-                    {label}
-                </div>
-                <div style={{ fontSize: 17, color: value ? '#222' : '#888' }}>
-                    {value
-                        ? value.toLocaleDateString('es-ES', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                          })
-                        : `Seleccionar fecha`}
-                </div>
-                <span style={{ marginLeft: 'auto', color: RENTAX_RED, fontSize: 20 }}>📅</span>
-            </div>
-            {open && (
-                <Calendar
-                    value={value}
-                    onChange={onChange}
-                    onClose={() => setOpen(false)}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                />
-            )}
-        </div>
-    );
-}
-
-function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
-    return (
-        <div style={{ background: RENTAX_DARK_GRAY, borderRadius: 8, height: 12, width: 120, marginLeft: 8, marginRight: 8 }}>
-            <div
-                style={{
-                    width: `${(value / max) * 100}%`,
-                    background: color,
-                    height: '100%',
-                    borderRadius: 8,
-                    transition: 'width 0.3s',
-                }}
-            />
-        </div>
-    );
-}
-
 export default function PrimerPropiedad({ params }: { params: { id: string } }) {
-    const property = mockProperty;
+    const [property, setProperty] = React.useState<Property | null>(null);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
 
     const [selectedImageIdx, setSelectedImageIdx] = React.useState(0);
     const [modalOpen, setModalOpen] = React.useState(false);
@@ -454,16 +41,448 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
     // Pregunta/comentario
     const [showQuestion, setShowQuestion] = React.useState(false);
     const [questionText, setQuestionText] = React.useState('');
-    const [questions, setQuestions] = React.useState(property.questions || []);
+    const [questions, setQuestions] = React.useState<Question[]>([]);
 
-    // Valoración
-    const avg = averageRating(property.reviews);
-    const dist = ratingDistribution(property.reviews);
+    // Fetch property data
+    React.useEffect(() => {
+        setLoading(true);
+        setError(null);
+        fetch(`http://localhost:8000/propiedades/${params.id}/`)
+            .then(async res => {
+                if (!res.ok) throw new Error('No se pudo cargar la propiedad');
+                const data = await res.json();
+                // Adaptar campos del backend a los del frontend
+                setProperty({
+                    id: data.id?.toString() ?? params.id,
+                    title: data.titulo ?? data.title ?? '',
+                    description: data.descripcion ?? '',
+                    mainImage: data.fotos?.[0]?.imagen ?? undefined,
+                    images: data.fotos?.map((f: any) => f.imagen) ?? [],
+                    ambientes: data.ambientes,
+                    huespedes: data.huespedes,
+                    banios: data.banios,
+                    precio: data.precio,
+                    reviews: [], // Si tienes reviews en backend, cámbialo aquí
+                    questions: [], // Si tienes preguntas en backend, cámbialo aquí
+                    // ...otros campos...
+                });
+                setQuestions([]); // Si tienes preguntas en backend, cámbialo aquí
+            })
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
+    }, [params.id]);
+
+    function averageRating(reviews: Review[]) {
+        if (!reviews.length) return 0;
+        return (
+            reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        );
+    }
+
+    function ratingDistribution(reviews: Review[]) {
+        const dist = [0, 0, 0, 0, 0];
+        reviews.forEach(r => {
+            dist[r.rating - 1]++;
+        });
+        return dist;
+    }
+
+    function ArrowButton({
+        direction,
+        onClick,
+        style = {},
+        size = 44,
+        ariaLabel,
+    }: {
+        direction: 'left' | 'right';
+        onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+        style?: React.CSSProperties;
+        size?: number;
+        ariaLabel?: string;
+    }) {
+        return (
+            <button
+                onClick={onClick}
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    [direction === 'left' ? 'left' : 'right']: -size / 1.2,
+                    transform: 'translateY(-50%)',
+                    background: '#fff',
+                    border: `2.5px solid ${RENTAX_RED}`,
+                    borderRadius: '50%',
+                    width: size,
+                    height: size,
+                    fontSize: size * 0.65,
+                    color: RENTAX_RED,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px #ff572233',
+                    zIndex: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    ...style,
+                }}
+                aria-label={ariaLabel}
+            >
+                {direction === 'left' ? '‹' : '›'}
+            </button>
+        );
+    }
+
+    function ImageModal({
+        src,
+        onClose,
+        onPrev,
+        onNext,
+    }: {
+        src: string;
+        onClose: () => void;
+        onPrev: () => void;
+        onNext: () => void;
+    }) {
+        React.useEffect(() => {
+            const handler = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') onClose();
+                if (e.key === 'ArrowLeft') onPrev();
+                if (e.key === 'ArrowRight') onNext();
+            };
+            window.addEventListener('keydown', handler);
+            return () => window.removeEventListener('keydown', handler);
+        }, [onClose, onPrev, onNext]);
+        return (
+            <div
+                onClick={onClose}
+                style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(30,30,30,0.85)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <div style={{ position: 'relative', maxWidth: '92vw', maxHeight: '88vh' }}>
+                    <ArrowButton direction="left" onClick={e => { e.stopPropagation(); onPrev(); }} ariaLabel="Anterior" size={54} style={{ left: -60, background: RENTAX_LIGHT_RED }} />
+                    <img
+                        src={src}
+                        alt="Vista grande"
+                        style={{
+                            maxWidth: '90vw',
+                            maxHeight: '85vh',
+                            borderRadius: 22,
+                            boxShadow: '0 8px 32px #0008',
+                            background: '#fff',
+                            padding: 16,
+                            border: `3px solid ${RENTAX_RED}`,
+                            display: 'block',
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    />
+                    <ArrowButton direction="right" onClick={e => { e.stopPropagation(); onNext(); }} ariaLabel="Siguiente" size={54} style={{ right: -60, background: RENTAX_LIGHT_RED }} />
+                </div>
+            </div>
+        );
+    }
+
+    function Calendar({
+        value,
+        onChange,
+        onClose,
+        minDate,
+        maxDate,
+    }: {
+        value: Date | null;
+        onChange: (date: Date) => void;
+        onClose: () => void;
+        minDate?: Date;
+        maxDate?: Date;
+    }) {
+        const [current, setCurrent] = React.useState(() => {
+            const d = value || new Date();
+            return new Date(d.getFullYear(), d.getMonth(), 1);
+        });
+
+        React.useEffect(() => {
+            function handleClick(e: MouseEvent) {
+                if (!(e.target as HTMLElement).closest('.calendar-popup')) {
+                    onClose();
+                }
+            }
+            document.addEventListener('mousedown', handleClick);
+            return () => document.removeEventListener('mousedown', handleClick);
+        }, [onClose]);
+
+        const daysInMonth = (year: number, month: number) =>
+            new Date(year, month + 1, 0).getDate();
+
+        const handleSelect = (day: number) => {
+            const date = new Date(current.getFullYear(), current.getMonth(), day);
+            if (
+                (minDate && date < minDate) ||
+                (maxDate && date > maxDate)
+            ) return;
+            onChange(date);
+            onClose();
+        };
+
+        const days = [];
+        const firstDay = new Date(current.getFullYear(), current.getMonth(), 1).getDay();
+        for (let i = 0; i < firstDay; i++) days.push(null);
+        for (let d = 1; d <= daysInMonth(current.getFullYear(), current.getMonth()); d++) {
+            days.push(d);
+        }
+
+        return (
+            <div
+                className="calendar-popup"
+                style={{
+                    position: 'absolute',
+                    top: 48,
+                    left: 0,
+                    zIndex: 10,
+                    background: '#fff',
+                    border: `2px solid ${RENTAX_RED}`,
+                    borderRadius: 12,
+                    boxShadow: '0 4px 24px #0003',
+                    padding: 18,
+                    width: 270,
+                }}
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <button
+                        onClick={() =>
+                            setCurrent(
+                                new Date(current.getFullYear(), current.getMonth() - 1, 1)
+                            )
+                        }
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            fontSize: 22,
+                            cursor: 'pointer',
+                            color: RENTAX_RED,
+                            fontWeight: 700,
+                        }}
+                    >
+                        ‹
+                    </button>
+                    <span style={{ fontWeight: 700, color: RENTAX_RED }}>
+                        {current.toLocaleString('es-ES', {
+                            month: 'long',
+                            year: 'numeric',
+                        })}
+                    </span>
+                    <button
+                        onClick={() =>
+                            setCurrent(
+                                new Date(current.getFullYear(), current.getMonth() + 1, 1)
+                            )
+                        }
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            fontSize: 22,
+                            cursor: 'pointer',
+                            color: RENTAX_RED,
+                            fontWeight: 700,
+                        }}
+                    >
+                        ›
+                    </button>
+                </div>
+                <div
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(7, 1fr)',
+                        gap: 4,
+                        marginBottom: 4,
+                        fontSize: 15,
+                        color: RENTAX_RED,
+                        fontWeight: 700,
+                        letterSpacing: 1,
+                    }}
+                >
+                    {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d) => (
+                        <div key={d} style={{ textAlign: 'center' }}>
+                            {d}
+                        </div>
+                    ))}
+                </div>
+                <div
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(7, 1fr)',
+                        gap: 4,
+                    }}
+                >
+                    {days.map((d, i) =>
+                        d ? (
+                            <button
+                                key={i}
+                                onClick={() => handleSelect(d)}
+                                disabled={
+                                    (minDate && new Date(current.getFullYear(), current.getMonth(), d) < minDate) ||
+                                    (maxDate && new Date(current.getFullYear(), current.getMonth(), d) > maxDate)
+                                }
+                                style={{
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: 8,
+                                    border: value &&
+                                        value.getDate() === d &&
+                                        value.getMonth() === current.getMonth() &&
+                                        value.getFullYear() === current.getFullYear()
+                                        ? `2.5px solid ${RENTAX_RED}`
+                                        : '1.5px solid #e0e0e0',
+                                    background:
+                                        value &&
+                                        value.getDate() === d &&
+                                        value.getMonth() === current.getMonth() &&
+                                        value.getFullYear() === current.getFullYear()
+                                            ? RENTAX_LIGHT_RED
+                                            : '#fafafa',
+                                    color: '#222',
+                                    cursor: 'pointer',
+                                    fontWeight: 600,
+                                    opacity:
+                                        (minDate && new Date(current.getFullYear(), current.getMonth(), d) < minDate) ||
+                                        (maxDate && new Date(current.getFullYear(), current.getMonth(), d) > maxDate)
+                                            ? 0.4
+                                            : 1,
+                                }}
+                            >
+                                {d}
+                            </button>
+                        ) : (
+                            <div key={i} />
+                        )
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    function DateSelector({
+        label,
+        value,
+        onChange,
+        minDate,
+        maxDate,
+        open,
+        setOpen,
+    }: {
+        label: string;
+        value: Date | null;
+        onChange: (date: Date) => void;
+        minDate?: Date;
+        maxDate?: Date;
+        open: boolean;
+        setOpen: (open: boolean) => void;
+    }) {
+        return (
+            <div style={{ position: 'relative', marginBottom: 0 }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: `linear-gradient(135deg, #fff 60%, ${RENTAX_LIGHT_RED} 100%)`,
+                        border: `2.5px solid ${RENTAX_RED}`,
+                        borderRadius: 12,
+                        padding: '14px 18px',
+                        boxShadow: '0 2px 8px #0001',
+                        minWidth: 220,
+                        cursor: 'pointer',
+                        gap: 16,
+                        fontWeight: 700,
+                    }}
+                    onClick={() => setOpen(true)}
+                >
+                    <div
+                        style={{
+                            background: RENTAX_RED,
+                            color: '#fff',
+                            borderRadius: 8,
+                            padding: '8px 18px',
+                            fontWeight: 800,
+                            fontSize: 16,
+                            letterSpacing: 1,
+                            boxShadow: '0 1px 4px #0002',
+                            marginRight: 12,
+                            minWidth: 70,
+                            textAlign: 'center',
+                        }}
+                    >
+                        {label}
+                    </div>
+                    <div style={{ fontSize: 17, color: value ? '#222' : '#888' }}>
+                        {value
+                            ? value.toLocaleDateString('es-ES', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric',
+                              })
+                            : `Seleccionar fecha`}
+                    </div>
+                    <span style={{ marginLeft: 'auto', color: RENTAX_RED, fontSize: 20 }}>📅</span>
+                </div>
+                {open && (
+                    <Calendar
+                        value={value}
+                        onChange={onChange}
+                        onClose={() => setOpen(false)}
+                        minDate={minDate}
+                        maxDate={maxDate}
+                    />
+                )}
+            </div>
+        );
+    }
+
+    function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
+        return (
+            <div style={{ background: RENTAX_DARK_GRAY, borderRadius: 8, height: 12, width: 120, marginLeft: 8, marginRight: 8 }}>
+                <div
+                    style={{
+                        width: `${(value / max) * 100}%`,
+                        background: color,
+                        height: '100%',
+                        borderRadius: 8,
+                        transition: 'width 0.3s',
+                    }}
+                />
+            </div>
+        );
+    }
+
+    const avg = averageRating(property?.reviews ?? []);
+    const dist = ratingDistribution(property?.reviews ?? []);
     const maxVotes = Math.max(...dist, 1);
 
     // Navegación imágenes
-    const goPrev = React.useCallback(() => setSelectedImageIdx(i => (i === 0 ? property.images.length - 1 : i - 1)), [property.images.length]);
-    const goNext = React.useCallback(() => setSelectedImageIdx(i => (i === property.images.length - 1 ? 0 : i + 1)), [property.images.length]);
+    const goPrev = React.useCallback(
+        () =>
+            setSelectedImageIdx(i =>
+                property?.images && property.images.length
+                    ? i === 0
+                        ? property.images.length - 1
+                        : i - 1
+                    : 0
+            ),
+        [property?.images]
+    );
+    const goNext = React.useCallback(
+        () =>
+            setSelectedImageIdx(i =>
+                property?.images && property.images.length
+                    ? i === property.images.length - 1
+                        ? 0
+                        : i + 1
+                    : 0
+            ),
+        [property?.images]
+    );
 
     // Evitar superposición de calendarios
     React.useEffect(() => {
@@ -479,6 +498,21 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
             setShowQuestion(false);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-2xl text-gray-600">
+                Cargando propiedad...
+            </div>
+        );
+    }
+    if (error || !property) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-2xl text-red-600">
+                {error || 'No se encontró la propiedad'}
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 font-sans py-10">
@@ -510,7 +544,11 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
                     <div style={{ position: 'relative', width: '100%', maxWidth: 800, margin: '0 auto', background: '#fff', borderRadius: 18, boxShadow: '0 2px 16px #e3e4ea', border: `2.5px solid ${RENTAX_DARK_GRAY}` }}>
                         <ArrowButton direction="left" onClick={goPrev} ariaLabel="Anterior" />
                         <img
-                            src={property.images[selectedImageIdx]}
+                            src={
+                                property.images && property.images.length
+                                    ? property.images[selectedImageIdx]
+                                    : 'https://via.placeholder.com/800x420?text=Sin+imagen'
+                            }
                             alt="Principal"
                             style={{
                                 width: '100%',
@@ -538,7 +576,7 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
                             maxWidth: 800,
                         }}
                     >
-                        {property.images.map((img, idx) => (
+                        {(property.images ?? []).map((img, idx) => (
                             <img
                                 key={img}
                                 src={img}
@@ -565,7 +603,7 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
                             />
                         ))}
                     </div>
-                    {modalOpen && (
+                    {modalOpen && property.images && property.images.length > 0 && (
                         <ImageModal
                             src={property.images[selectedImageIdx]}
                             onClose={() => setModalOpen(false)}
@@ -588,6 +626,13 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
                 >
                     {property.title}
                 </h1>
+
+                {/* Precio */}
+                {property.precio && (
+                    <div style={{ fontSize: 28, color: '#007a4d', fontWeight: 800, marginBottom: 10 }}>
+                        ${property.precio}
+                    </div>
+                )}
 
                 {/* Descripción */}
                 <div
@@ -620,15 +665,21 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
                         fontWeight: 700,
                     }}
                 >
-                    <div style={{ color: RENTAX_RED }}>
-                        <strong>Ambientes:</strong> {property.ambientes}
-                    </div>
-                    <div style={{ color: RENTAX_RED }}>
-                        <strong>Huéspedes:</strong> {property.huespedes}
-                    </div>
-                    <div style={{ color: RENTAX_RED }}>
-                        <strong>Baños:</strong> {property.banios}
-                    </div>
+                    {property.ambientes !== undefined && (
+                        <div style={{ color: RENTAX_RED }}>
+                            <strong>Ambientes:</strong> {property.ambientes}
+                        </div>
+                    )}
+                    {property.huespedes !== undefined && (
+                        <div style={{ color: RENTAX_RED }}>
+                            <strong>Huéspedes:</strong> {property.huespedes}
+                        </div>
+                    )}
+                    {property.banios !== undefined && (
+                        <div style={{ color: RENTAX_RED }}>
+                            <strong>Baños:</strong> {property.banios}
+                        </div>
+                    )}
                 </div>
 
                 {/* Selectores de fechas y botón ALQUILAR */}
@@ -712,7 +763,7 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
                             {avg.toFixed(1)}
                         </span>
                         <span style={{ fontSize: 20, color: '#888', marginLeft: 8 }}>
-                            ({property.reviews.length} valoraciones)
+                            ({(property.reviews ?? []).length} valoraciones)
                         </span>
                     </div>
                     {/* Barras de progreso */}
@@ -731,7 +782,7 @@ export default function PrimerPropiedad({ params }: { params: { id: string } }) 
                     </div>
                     {/* Comentarios */}
                     <div style={{ marginTop: 24 }}>
-                        {property.reviews.map((review, idx) => (
+                        {(property.reviews ?? []).map((review, idx) => (
                             <div
                                 key={idx}
                                 style={{
