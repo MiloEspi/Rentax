@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from .models import Alquiler
 from propiedades.models import Propiedad
+from usuarios.models import Usuario
 from datetime import timedelta
 
 class AlquilerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alquiler
-        exclude = ['codigo']  # Excluye 'codigo' para que no venga del front
+        exclude = ['codigo']  # Solo excluye 'codigo', permite que 'inquilino' venga del front
 
     def validate(self, attrs):
         propiedad = attrs.get('perteneceAPropiedad')
@@ -33,4 +34,5 @@ class AlquilerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Asigna el código automáticamente
         validated_data['codigo'] = Alquiler.objects.count() + 1
+        # Ya recibe 'inquilino' correctamente del front, no hace falta buscarlo ni convertirlo
         return super().create(validated_data)

@@ -159,23 +159,7 @@ class PropiedadListCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['PUT'])
-def modificar_departamento(request, id):
-    # Lógica para actualizar solo campos de Departamento
-    # ...tu código aquí...
-    return Response(...)
 
-@api_view(['PUT'])
-def modificar_casa(request, id):
-    # Lógica para actualizar solo campos de Casa
-    # ...tu código aquí...
-    return Response(...)
-
-@api_view(['PUT'])
-def modificar_oficina(request, id):
-    # Lógica para actualizar solo campos de Oficina
-    # ...tu código aquí...
-    return Response(...)
 
 class ViviendaListView(APIView):
     def get(self, request):

@@ -32,6 +32,19 @@ export default function Login() {
             if (response.ok && data.success) {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
+
+                // Obtener el ID del usuario y guardarlo en localStorage
+                try {
+                    const idResponse = await fetch(`http://localhost:8000/getID/?email=${encodeURIComponent(email)}`);
+                    const idData = await idResponse.json();
+                        console.log(idData.id);
+                    if (idResponse.ok && idData.id) {
+                        localStorage.setItem('userID', idData.id.toString());
+                    }
+                } catch (idErr) {
+                    // Si falla, no bloquea el login, solo no guarda el ID
+                }
+
                 window.location.href = '/';
             } else if (data.is_admin) {
                 localStorage.setItem('adminEmail', email);

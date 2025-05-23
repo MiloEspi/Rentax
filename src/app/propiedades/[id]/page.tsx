@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 type Review = { user: string; comment: string; rating: number };
 type Question = { user: string; question: string; response?: string };
@@ -45,6 +46,10 @@ export default function PrimerPropiedad({ params }: { params: Promise<{ id: stri
     const [showQuestion, setShowQuestion] = React.useState(false);
     const [questionText, setQuestionText] = React.useState('');
     const [questions, setQuestions] = React.useState<Question[]>([]);
+
+    // Alquilar
+    const router = useRouter();
+    const [alquilarError, setAlquilarError] = React.useState<string | null>(null);
 
     // Fetch property data
     React.useEffect(() => {
@@ -502,6 +507,60 @@ export default function PrimerPropiedad({ params }: { params: Promise<{ id: stri
         }
     };
 
+    // Calcula la cantidad de días y el precio total
+    function calcularPrecioTotal() {
+        if (!startDate || !endDate || !property?.precio) return null;
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const dias = Math.round((endDate.getTime() - startDate.getTime()) / msPerDay);
+        if (dias < 1) return null;
+        return dias * Number(property.precio);
+    }
+
+    // Handler para alquilar
+    async function handleAlquilar() {
+        setAlquilarError(null);
+        if (!startDate || !endDate) {
+            setAlquilarError('Debes seleccionar fechas de inicio y fin.');
+            return;
+        }
+        const precio = calcularPrecioTotal();
+        if (!precio) {
+            setAlquilarError('Las fechas seleccionadas no son válidas.');
+            return;
+        }
+        try {
+            console.log('userID en localStorage:', localStorage.getItem('userID'));
+
+            const res = await fetch('http://localhost:8000/alquileres/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Si usas autenticación por token, agrega aquí el header Authorization
+                },
+                body: JSON.stringify({
+                    fechaInicio: startDate.toISOString().split('T')[0],
+                    fechaFin: endDate.toISOString().split('T')[0],
+                    precio: precio,
+                    perteneceAPropiedad: property.id,
+                    inquilino: localStorage.getItem('userID'),
+                }),
+              
+            });
+            const data = await res.json();
+            if (res.ok) {
+                router.push('/perfil');
+            } else {
+                setAlquilarError(
+                    typeof data === 'string'
+                        ? data
+                        : data?.detail || data?.non_field_errors?.[0] || JSON.stringify(data)
+                );
+            }
+        } catch (e: any) {
+            setAlquilarError('Error de red o del servidor.');
+        }
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center text-2xl text-gray-600">
@@ -738,9 +797,15 @@ export default function PrimerPropiedad({ params }: { params: Promise<{ id: stri
                             textShadow: '0 2px 8px #ff572244',
                             transition: 'background 0.2s, box-shadow 0.2s',
                         }}
+                        onClick={handleAlquilar}
                     >
                         ALQUILAR
                     </button>
+                    {alquilarError && (
+                        <div style={{ color: 'red', fontWeight: 700, marginLeft: 18, maxWidth: 300 }}>
+                            {alquilarError}
+                        </div>
+                    )}
                 </div>
 
                 {/* Valoración y comentarios */}
