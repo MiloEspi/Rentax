@@ -173,3 +173,27 @@ def modificar_oficina(request, id):
     # Lógica para actualizar solo campos de Oficina
     # ...tu código aquí...
     return Response(...)
+
+class ViviendaListView(APIView):
+    def get(self, request):
+        viviendas = Vivienda.objects.all()
+        ciudad = request.GET.get('ciudad')
+        huespedes = request.GET.get('huespedes')
+        ambientes = request.GET.get('ambientes')
+        banios = request.GET.get('banios')
+        atributos = request.GET.get('atributos')  # Coma separada: "wifi,tv"
+
+        if ciudad:
+            viviendas = viviendas.filter(localidad__nombre__icontains=ciudad)
+        if huespedes:
+            viviendas = viviendas.filter(huespedes__gte=int(huespedes))
+        if ambientes:
+            viviendas = viviendas.filter(ambientes__gte=int(ambientes))
+        if banios:
+            viviendas = viviendas.filter(banios__gte=int(banios))
+        if atributos:
+            for atributo in atributos.split(','):
+                viviendas = viviendas.filter(atributos__contains=[atributo])
+
+        serializer = ViviendaSerializer(viviendas, many=True, context={'request': request})
+        return Response(serializer.data)

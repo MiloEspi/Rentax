@@ -17,7 +17,6 @@ const TIPOS_PROPIEDAD = [
   { label: 'Cochera', value: 'cochera' },
 ];
 
-// Colores para el calendario
 const RENTAX_RED = '#ff5a1f';
 const RENTAX_LIGHT_RED = '#ffe7db';
 
@@ -285,7 +284,7 @@ export default function BuscarPropiedades() {
   const [ciudadInput, setCiudadInput] = useState('');
   const [ciudadFiltrada, setCiudadFiltrada] = useState<string[]>([]);
   const [selectedCity, setSelectedCity] = useState('');
-  const [precio, setPrecio] = useState<[number, number]>([30, 500]);
+  const [precio, setPrecio] = useState<[number, number]>([0, 500]);
   const [metros, setMetros] = useState<[number, number]>([10, 500]);
   const [resultados, setResultados] = useState<any[]>([]);
   const [showResultados, setShowResultados] = useState(false);
@@ -339,6 +338,18 @@ export default function BuscarPropiedades() {
       .catch(() => setCiudadFiltrada([]));
   }, [ciudadInput]);
 
+  // Trae todas las viviendas al montar
+  useEffect(() => {
+    fetch('http://localhost:8000/viviendas/')
+      .then(res => res.json())
+      .then(data => setResultados(data))
+      .catch(() => setResultados([]));
+  }, []);
+
+  // (Duplicated ciudadFiltro and resultadosFiltrados removed)
+
+  // (Duplicated resetAll removed)
+
   // Custom range bar refs
   const barRef = useRef<HTMLDivElement>(null);
   const metrosBarRef = useRef<HTMLDivElement>(null);
@@ -349,7 +360,7 @@ export default function BuscarPropiedades() {
     const rect = barRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percent = x / rect.width;
-    const value = Math.round(30 + percent * (500 - 30));
+    const value = Math.round(0 + percent * (500 - 0));
     const distToMin = Math.abs(value - precio[0]);
     const distToMax = Math.abs(value - precio[1]);
     if (distToMin < distToMax) {
@@ -383,20 +394,68 @@ export default function BuscarPropiedades() {
   //   { label: 'Local Comercial', value: 'local' },
   // ];
 
-  const handleBuscar = () => {
-    setShowResultados(true);
-    // Simulación de filtrado por tipoPropiedad
-    setResultados([
-      { id: 1, titulo: tipoPropiedad === 'vivienda' ? 'Casa' : tipoPropiedad === 'local' ? 'Local Comercial' : 'Cochera', ciudad: selectedCity, precio: 100, foto: '', tipo: tipoPropiedad },
-      { id: 2, titulo: tipoPropiedad === 'vivienda' ? 'Depto' : tipoPropiedad === 'local' ? 'Local Centro' : 'Cochera Cubierta', ciudad: selectedCity, precio: 200, foto: '', tipo: tipoPropiedad },
-      { id: 3, titulo: tipoPropiedad === 'vivienda' ? 'PH' : tipoPropiedad === 'local' ? 'Local Galería' : 'Cochera Descubierta', ciudad: selectedCity, precio: 300, foto: '', tipo: tipoPropiedad },
-    ]);
-  };
+  // Trae todas las propiedades al montar
+  useEffect(() => {
+    fetch('http://localhost:8000/viviendas/')
+      .then(res => res.json())
+      .then(data => setResultados(data))
+      .catch(() => setResultados([]));
+  }, []);
+
+  // Cambia el fetch para traer solo viviendas
+
+  // Filtro de ciudad (usa selectedCity si está, sino ciudadInput)
+  const ciudadFiltro = selectedCity || ciudadInput;
+
+  // Filtro principal
+  const resultadosFiltrados = resultados.filter(v => {
+    // Filtra por tipo de propiedad
+    if (v.tipo !== tipoPropiedad) return false;
+
+    // Filtros solo para vivienda
+    if (tipoPropiedad === 'vivienda') {
+      if (
+        (ciudadFiltro && !(v.localidad && v.localidad.nombre && v.localidad.nombre.toLowerCase().includes(ciudadFiltro.toLowerCase())))
+        || (serviciosSeleccionados.length > 0 && !serviciosSeleccionados.every(s => v.atributos?.includes(s)))
+        || (huespedes && (!v.huespedes || v.huespedes < huespedes))
+        || (ambientes && (!v.ambientes || v.ambientes < ambientes))
+        || (banios && (!v.banios || v.banios < banios))
+        || (v.precio < precio[0] || v.precio > precio[1])
+      ) {
+        return false;
+      }
+    }
+
+    // Filtros solo para local
+    if (tipoPropiedad === 'local') {
+      if (
+        (ciudadFiltro && !(v.localidad && v.localidad.nombre && v.localidad.nombre.toLowerCase().includes(ciudadFiltro.toLowerCase())))
+        || (v.metros && (v.metros < metros[0] || v.metros > metros[1]))
+        || (v.precio < precio[0] || v.precio > precio[1])
+      ) {
+        return false;
+      }
+    }
+
+    // Filtros solo para cochera
+    if (tipoPropiedad === 'cochera') {
+      if (
+        (ciudadFiltro && !(v.localidad && v.localidad.nombre && v.localidad.nombre.toLowerCase().includes(ciudadFiltro.toLowerCase())))
+        || (v.precio < precio[0] || v.precio > precio[1])
+      ) {
+        return false;
+      }
+    }
+
+    // Si pasa todos los filtros, mostrar
+    return true;
+  });
+
 
   const resetAll = () => {
     setSelectedCity('');
     setCiudadInput('');
-    setPrecio([30, 500]);
+    setPrecio([0, 500]);
     setMetros([10, 500]);
     setResultados([]);
     setShowResultados(false);
@@ -424,7 +483,7 @@ export default function BuscarPropiedades() {
       let x = e.clientX - rect.left;
       x = Math.max(0, Math.min(x, rect.width));
       const percent = x / rect.width;
-      const value = Math.round(30 + percent * (500 - 30));
+      const value = Math.round(0 + percent * (500 - 0));
       if (dragging === 'min') {
         setPrecio([Math.min(value, precio[1] - 1), precio[1]]);
       } else {
@@ -481,9 +540,6 @@ export default function BuscarPropiedades() {
         : [...prev, value]
     );
   };
-
-  // Filtrar resultados por tipoPropiedad
-  const resultadosFiltrados = resultados.filter(r => r.tipo === tipoPropiedad);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 font-sans py-10">
@@ -568,8 +624,8 @@ export default function BuscarPropiedades() {
               <div
                 className="absolute h-8 bg-orange-500 rounded-full"
                 style={{
-                  left: `${((precio[0] - 30) / (500 - 30)) * 100}%`,
-                  width: `${((precio[1] - precio[0]) / (500 - 30)) * 100}%`,
+                  left: `${((precio[0] - 0) / (500 - 0)) * 100}%`,
+                  width: `${((precio[1] - precio[0]) / (500 - 0)) * 100}%`,
                   top: 0,
                   transition: dragging ? 'none' : 'left 0.1s, width 0.1s',
                   opacity: 0.95,
@@ -579,7 +635,7 @@ export default function BuscarPropiedades() {
               <div
                 className="absolute top-1/2 -translate-y-1/2 w-7 h-7 bg-white border-4 border-orange-500 rounded-full shadow cursor-pointer z-10"
                 style={{
-                  left: `calc(${((precio[0] - 30) / (500 - 30)) * 100}% - 14px)`,
+                  left: `calc(${((precio[0] - 0) / (500 - 0)) * 100}% - 14px)`,
                   transition: dragging === 'min' ? 'none' : 'left 0.1s',
                 }}
                 onMouseDown={e => {
@@ -593,7 +649,7 @@ export default function BuscarPropiedades() {
               <div
                 className="absolute top-1/2 -translate-y-1/2 w-7 h-7 bg-white border-4 border-orange-500 rounded-full shadow cursor-pointer z-10"
                 style={{
-                  left: `calc(${((precio[1] - 30) / (500 - 30)) * 100}% - 14px)`,
+                  left: `calc(${((precio[1] - 0) / (500 - 0)) * 100}% - 14px)`,
                   transition: dragging === 'max' ? 'none' : 'left 0.1s',
                 }}
                 onMouseDown={e => {
@@ -605,7 +661,7 @@ export default function BuscarPropiedades() {
               />
             </div>
             <div className="flex justify-between text-gray-500 text-sm mt-1 px-1">
-              <span>$30</span>
+              <span>$0</span>
               <span>$500</span>
             </div>
           </div>
@@ -813,7 +869,7 @@ export default function BuscarPropiedades() {
             Borrar todo
           </button>
           <button
-            onClick={handleBuscar}
+            onClick={() => setShowResultados(true)}
             className="bg-orange-500 text-white px-12 py-4 rounded-lg font-bold shadow-lg text-2xl hover:bg-orange-600 transition-all"
           >
             Buscar
@@ -834,8 +890,15 @@ export default function BuscarPropiedades() {
                   >
                     {/* Foto principal */}
                     <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                      {/* Imagen vacía */}
-                      <span className="text-gray-400 text-3xl">Foto</span>
+                      {r.fotos && r.fotos.length > 0 ? (
+                        <img
+                          src={r.fotos[0].imagen}
+                          alt={r.titulo}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <span className="text-gray-400 text-3xl">Sin foto</span>
+                      )}
                     </div>
                     {/* Nombre */}
                     <div className="px-6 py-4 border-b border-gray-100">
@@ -848,8 +911,10 @@ export default function BuscarPropiedades() {
                         <span className="text-orange-600 font-bold text-lg">{r.precio ? `$${r.precio}` : <>&nbsp;</>}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-500">Ciudad:</span>
-                        <span className="text-gray-700 font-semibold">{r.ciudad || <>&nbsp;</>}</span>
+                        <span className="text-gray-500">Localidad:</span>
+                        <span className="text-gray-700 font-semibold">
+                          {r.localidad?.nombre || <>&nbsp;</>}
+                        </span>
                       </div>
                     </div>
                   </div>
