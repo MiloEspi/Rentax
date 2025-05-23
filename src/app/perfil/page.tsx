@@ -35,7 +35,7 @@ const PerfilPage = () => {
 
     const [editando, setEditando] = useState(false);
     const [password, setPassword] = useState('');
-    const [errores, setErrores] = useState({ password: '', fechaNacimiento: '' });
+    const [errores, setErrores] = useState({ password: '', fechaNacimiento: '', nombre: '' });
     const [successMsg, setSuccessMsg] = useState('');
 
     const [loading, setLoading] = useState(true);
@@ -101,7 +101,7 @@ const PerfilPage = () => {
         setUser(originalUser);
         setEditando(false);
         setPassword('');
-        setErrores({ password: '', fechaNacimiento: '' });
+        setErrores({ password: '', fechaNacimiento: '', nombre: '' });
     };
 
     const handleSave = (e: React.FormEvent) => {
@@ -109,17 +109,28 @@ const PerfilPage = () => {
         let valid = true;
         let passwordError = '';
         let fechaNacimientoError = '';
+        let nombreError = '';
 
+        // Validar el campo 'nombre'
+        if (!user.nombre.trim()) {
+            nombreError = "El campo 'nombre' es obligatorio.";
+            valid = false;
+        }
+
+        // Validar la contraseña
         if (password && password.length < 8) {
             passwordError = 'La contraseña debe tener al menos 8 caracteres.';
             valid = false;
         }
+
+        // Validar la fecha de nacimiento
         if (!esMayorDeEdad(user.fechaNacimiento)) {
             fechaNacimientoError = 'Debes ser mayor de 18 años.';
             valid = false;
         }
 
-        setErrores({ password: passwordError, fechaNacimiento: fechaNacimientoError });
+        // Actualizar los errores
+        setErrores({ password: passwordError, fechaNacimiento: fechaNacimientoError, nombre: nombreError });
 
         if (!valid) return;
 
@@ -218,6 +229,9 @@ const PerfilPage = () => {
                                     color: 'black'
                                 }}
                             />
+                            {errores.nombre && (
+                                <div style={{ color: 'red', fontSize: 13, marginTop: 4 }}>{errores.nombre}</div>
+                            )}
                         </div>
                         <div style={{ flex: 1 }}>
                             <label style={{ fontWeight: 600, color: '#6366f1' }}>Apellido</label>
