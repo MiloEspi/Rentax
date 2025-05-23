@@ -116,7 +116,7 @@ export default function CargarPropiedad() {
     if (!form.precio) return 'Debe indicar el precio por día.';
     if (!form.cantidadDiasMinimo) return 'Debe seleccionar la cantidad mínima de días.';
     if (!form.politica) return 'Debe seleccionar la política de cancelación.';
-    if (form.fotos.length < 3) return 'Como minimo se tienen que cargar 3 fotos.';
+    if (form.fotos.length < 1) return 'Como minimo se tiene que cargar 1 foto.';
     if (form.fotos.length > 20) return 'Solo se pueden cargar hasta 20 fotos.';
     return null;
   };

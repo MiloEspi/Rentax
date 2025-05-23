@@ -24,6 +24,9 @@ class Propiedad(models.Model):
     politica=models.ForeignKey(Politica_De_Cancelacion,on_delete=models.SET_NULL, null=True)
     localidad=models.ForeignKey(Localidad,on_delete=models.CASCADE, null=True)
     tipoPropiedad=models.CharField(max_length=20)
+    cantidadDiasMinimo = models.IntegerField(null=True)
+
+
     def __str__(self):
         return self.titulo 
 
@@ -36,8 +39,8 @@ class Cochera(Propiedad):
     cupo_de_autos=models.IntegerField()
 class Vivienda(Propiedad):
     huespedes = models.IntegerField(null=True)
-    cantidadDiasMinimo = models.IntegerField(null=True)
     banios = models.IntegerField(null=True)
+
     ambientes = models.IntegerField()
     # Nuevos campos
     atributos = models.JSONField(default=list, blank=True)  # Ej: ["wifi", "pileta"]
