@@ -11,14 +11,12 @@ export default function VerificacionAdmin() {
 
     const email = typeof window !== "undefined" ? localStorage.getItem('adminEmail') : "";
 
-    // Redirige al home si ya está logueado
     useEffect(() => {
         if (localStorage.getItem('isLoggedIn') === 'true') {
             router.replace('/');
         }
     }, [router]);
 
-    // Envía el código al cargar la página
     useEffect(() => {
         if (email) {
             setLoading(true);
@@ -44,7 +42,6 @@ export default function VerificacionAdmin() {
             setError("Por favor ingrese el código.");
             return;
         }
-        // Validar el código con el backend
         const res = await fetch('http://localhost:8000/validarCodigo/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -53,7 +50,7 @@ export default function VerificacionAdmin() {
         const data = await res.json();
         if (res.ok && data.success) {
             localStorage.setItem('isLoggedIn', 'true');                        
-            localStorage.setItem('isAdmin', 'true'); // <-- ESTA LÍNEA AGREGA EL FLAG DE ADMIN
+            localStorage.setItem('isAdmin', 'true');
             localStorage.removeItem('adminEmail');
 
             window.location.href = '/';
@@ -63,26 +60,65 @@ export default function VerificacionAdmin() {
     };
 
     return (
-        <div style={{ maxWidth: 400, margin: "60px auto", padding: 24, border: "1px solid #eee", borderRadius: 8, boxShadow: "0 2px 8px #eee" }}>
-            <h2>Verificación en dos pasos</h2>
-            <p>Ingrese el código que se ha enviado a tu mail.</p>
-            {loading && <div>Enviando código...</div>}
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    value={codigo}
-                    onChange={e => setCodigo(e.target.value)}
-                    placeholder="Código de verificación"
-                    style={{ width: "100%", padding: 8, marginBottom: 12, borderRadius: 4, border: "1px solid #ccc" }}
-                />
-                {error && <div style={{ color: "red", marginBottom: 8 }}>{error}</div>}
-                <button type="submit" style={{ width: "100%", padding: 10, borderRadius: 4, background: "#0070f3", color: "#fff", border: "none" }}>
-                    Verificar
-                </button>
-            </form>
-            {enviado && <div style={{ color: "green", marginTop: 16 }}>¡Código enviado al mail!</div>}
+        <div style={{ 
+            backgroundColor: "#fff", // Fondo blanco para toda la página
+            minHeight: "100vh", 
+            display: "flex", 
+            justifyContent: "center", 
+            alignItems: "center" 
+        }}>
+            <div style={{ 
+                maxWidth: 400, 
+                margin: "60px auto", 
+                padding: 24, 
+                borderRadius: 8, 
+                backgroundColor: "#fff", 
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", 
+                textAlign: "center" 
+            }}>
+                <h1 style={{ 
+                    color: "#FFA500", // Naranja más amarillento
+                    marginBottom: 24, 
+                    fontSize: "1.5rem" 
+                }}>
+                    Ingrese el Código
+                </h1>
+                {loading && <div style={{ marginBottom: 16, color: "#FFA500" }}>Enviando código...</div>}
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        value={codigo}
+                        onChange={e => setCodigo(e.target.value)}
+                        placeholder="Código de verificación"
+                        style={{ 
+                            width: "100%", 
+                            padding: 12, 
+                            marginBottom: 16, 
+                            borderRadius: 4, 
+                            border: "1px solid #ccc", 
+                            fontSize: "1rem", 
+                            color: "#000" // Letras negras
+                        }}
+                    />
+                    {error && <div style={{ color: "red", marginBottom: 16 }}>{error}</div>}
+                    <button 
+                        type="submit" 
+                        style={{ 
+                            width: "100%", 
+                            padding: 12, 
+                            borderRadius: 4, 
+                            backgroundColor: "#FFA500", // Naranja más amarillento
+                            color: "#fff", 
+                            border: "none", 
+                            fontSize: "1rem", 
+                            cursor: "pointer" 
+                        }}
+                    >
+                        Verificar Código
+                    </button>
+                </form>
+                {enviado && <div style={{ color: "green", marginTop: 16 }}>¡Código enviado al mail!</div>}
+            </div>
         </div>
     );
 }
-
-

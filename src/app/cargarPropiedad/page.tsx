@@ -390,6 +390,7 @@ export default function CargarPropiedad() {
                 padding: '12px 16px',
                 fontSize: 18,
                 background: '#fff',
+                color: 'black', // Cambiado a negro
               }}
             />
 
@@ -408,6 +409,7 @@ export default function CargarPropiedad() {
                 fontSize: 18,
                 background: '#fff',
                 resize: 'vertical',
+                color: 'black', // Cambiado a negro
               }}
             />
 
@@ -423,6 +425,7 @@ export default function CargarPropiedad() {
                 padding: '12px 16px',
                 fontSize: 18,
                 background: '#fff',
+                color: 'black', // Cambiado a negro
               }}
             >
               <option value="">Seleccionar ciudad</option>
@@ -447,6 +450,7 @@ export default function CargarPropiedad() {
                   fontSize: 16,
                   background: '#fff',
                   flex: 2,
+                  color: 'black', // Cambiado a negro
                 }}
               />
               <input
@@ -462,6 +466,7 @@ export default function CargarPropiedad() {
                   fontSize: 16,
                   background: '#fff',
                   width: 80,
+                  color: 'black', // Cambiado a negro
                 }}
               />
               <input
@@ -477,6 +482,7 @@ export default function CargarPropiedad() {
                   fontSize: 16,
                   background: '#fff',
                   width: 70,
+                  color: 'black', // Cambiado a negro
                 }}
               />
               <input
@@ -492,6 +498,7 @@ export default function CargarPropiedad() {
                   fontSize: 16,
                   background: '#fff',
                   width: 70,
+                  color: 'black', // Cambiado a negro
                 }}
               />
             </div>
@@ -508,6 +515,7 @@ export default function CargarPropiedad() {
                 padding: '12px 16px',
                 fontSize: 18,
                 background: '#fff',
+                color: 'black', // Cambiado a negro
               }}
             >
               <option value="">Seleccionar política</option>
@@ -555,6 +563,7 @@ export default function CargarPropiedad() {
                       background: '#fff', borderRadius: 10, padding: '8px 10px',
                       border: `2px solid ${RENTAX_LIGHT_RED}`,
                       marginTop: 2,
+                      color: 'black', // Cambiado a negro
                     }}>
                       <button type="button" onClick={() => handleSumar('ambientes', -1)}
                         style={{
@@ -575,6 +584,7 @@ export default function CargarPropiedad() {
                       background: '#fff', borderRadius: 10, padding: '8px 10px',
                       border: `2px solid ${RENTAX_LIGHT_RED}`,
                       marginTop: 2,
+                      color: 'black', // Cambiado a negro
                     }}>
                       <button type="button" onClick={() => handleSumar('huespedes', -1)}
                         style={{
@@ -595,6 +605,7 @@ export default function CargarPropiedad() {
                       background: '#fff', borderRadius: 10, padding: '8px 10px',
                       border: `2px solid ${RENTAX_LIGHT_RED}`,
                       marginTop: 2,
+                      color: 'black', // Cambiado a negro
                     }}>
                       <button type="button" onClick={() => handleSumar('banios', -1)}
                         style={{
@@ -621,6 +632,7 @@ export default function CargarPropiedad() {
                       padding: '8px 18px',
                       cursor: 'pointer',
                       fontWeight: 600,
+                      color: 'black', // Cambiado a negro
                     }}>
                       <input
                         type="checkbox"
@@ -652,6 +664,7 @@ export default function CargarPropiedad() {
                     padding: '12px 16px',
                     fontSize: 18,
                     background: '#fff',
+                    color: 'black', // Cambiado a negro
                   }}
                 />
               </>
@@ -672,6 +685,7 @@ export default function CargarPropiedad() {
                 padding: '12px 16px',
                 fontSize: 18,
                 background: '#fff',
+                color: 'black', // Cambiado a negro
               }}
             />
 
@@ -690,6 +704,7 @@ export default function CargarPropiedad() {
                 padding: '12px 16px',
                 fontSize: 18,
                 background: '#fff',
+                color: 'black', // Cambiado a negro
               }}
             />
 
@@ -707,6 +722,7 @@ export default function CargarPropiedad() {
                 padding: '10px',
                 background: '#fff',
                 fontSize: 16,
+                color: 'black', // Cambiado a negro
               }}
               // Limitar selección a 20 archivos desde el input (no todos los navegadores lo respetan)
               max={20}
@@ -725,6 +741,7 @@ export default function CargarPropiedad() {
                       width: 90, height: 70, objectFit: 'cover', borderRadius: 8, border: `2px solid ${RENTAX_RED}`,
                       boxShadow: '0 1px 6px #ff572244',
                       background: '#fff',
+                      color: 'black', // Cambiado a negro
                     }}
                   />
                 ))}

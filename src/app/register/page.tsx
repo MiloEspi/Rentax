@@ -19,7 +19,7 @@ export default function Register() {
     const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
     const router = useRouter();
 
-     useEffect(() => {
+    useEffect(() => {
         if (localStorage.getItem('isLoggedIn') === 'true') {
             router.replace('/');
         }
@@ -41,7 +41,6 @@ export default function Register() {
     };
 
     const validateForm = () => {
-        // Validar campos obligatorios
         if (!form.nombre) return 'El nombre es obligatorio';
         if (!form.apellido) return 'El apellido es obligatorio';
         if (!form.email) return 'El correo electrónico es obligatorio';
@@ -49,18 +48,15 @@ export default function Register() {
         if (!form.dni) return 'El DNI es obligatorio';
         if (!form.sexo) return 'El sexo es obligatorio';
         if (!form.fecha_nacimiento) return 'La fecha de nacimiento es obligatoria';
-    
-        // Validar formatos o restricciones
+
         if (!form.email.includes('@')) return 'El correo electrónico no es válido';
         if (form.password.length < 8) return 'La contraseña debe tener al menos 8 caracteres';
-    
+
         const age = calculateAge(form.fecha_nacimiento);
         if (age < 18) return 'Debes tener al menos 18 años';
-    
+
         return null;
     };
-    
-  
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -76,7 +72,6 @@ export default function Register() {
         setIsSubmitting(true);
 
         try {
-            // Transformar los datos para enviarlos en el formato esperado por el backend
             const payload = {
                 persona: { ...form }
             };
@@ -99,9 +94,7 @@ export default function Register() {
                     setError(errorData.persona.dni);
                 } else if (errorData.persona && errorData.persona.email) {
                     setError(errorData.persona.email);
-
-                }
-                else {
+                } else {
                     setError(errorData.message || 'Hubo un error al registrar el usuario');
                 }
             }
@@ -114,166 +107,161 @@ export default function Register() {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#FFFFFF' }}>
             <form
                 onSubmit={handleSubmit}
-                style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '300px' }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '600px', padding: '2rem', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', borderRadius: '8px' }}
             >
-                <h1 style={{ textAlign: 'center' }}>Registro</h1>
-                <label style={{ fontWeight: 'bold', color: fieldErrors.nombre ? 'red' : undefined }}>Nombre</label>
-                <input
-                    name="nombre"
-                    value={form.nombre}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Nombre"
-                    style={{
-                        borderColor: fieldErrors.nombre ? 'red' : undefined,
-                        borderRadius: '8px',
-                        borderWidth: '1px',
-                        padding: '0.5rem',
-                    }}
-                />
-                {fieldErrors.nombre && <p style={{ color: 'red' }}>{fieldErrors.nombre}</p>}
-
-                <label style={{ fontWeight: 'bold', color: fieldErrors.apellido ? 'red' : undefined }}>Apellido</label>
-                <input
-                    name="apellido"
-                    value={form.apellido}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Apellido"
-                    style={{
-                        borderColor: fieldErrors.apellido ? 'red' : undefined,
-                        borderRadius: '8px',
-                        borderWidth: '1px',
-                        padding: '0.5rem',
-                    }}
-                />
-                {fieldErrors.apellido && <p style={{ color: 'red' }}>{fieldErrors.apellido}</p>}
-
-                <label style={{ fontWeight: 'bold', color: fieldErrors.email ? 'red' : undefined }}>Correo electrónico</label>
-                <input
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Correo electrónico"
-                    style={{
-                        borderColor: fieldErrors.email ? 'red' : undefined,
-                        borderRadius: '8px',
-                        borderWidth: '1px',
-                        padding: '0.5rem',
-                    }}
-                />
-                {fieldErrors.email && <p style={{ color: 'red' }}>{fieldErrors.email}</p>}
-
-                <div style={{ position: 'relative' }}>
-                    <label style={{ fontWeight: 'bold', color: fieldErrors.password ? 'red' : undefined }}>Contraseña</label>
-                    <input
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Contraseña"
-                        value={form.password}
+                <h1 style={{ textAlign: 'center', fontSize: '2rem', color: '#FFA726', marginBottom: '1rem' }}>Registrarme</h1>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div>
+                            <label style={{ fontWeight: 'bold', color: fieldErrors.nombre ? 'red' : '#000' }}>Nombre</label>
+                            <input
+                                name="nombre"
+                                value={form.nombre}
+                                onChange={handleChange}
+                                type="text"
+                                placeholder="Nombre"
+                                style={{
+                                    borderColor: fieldErrors.nombre ? 'red' : '#FFA726',
+                                    borderRadius: '8px',
+                                    borderWidth: '1px',
+                                    padding: '0.5rem',
+                                    color: '#000',
+                                    width: '100%',
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ fontWeight: 'bold', color: fieldErrors.email ? 'red' : '#000' }}>Correo electrónico</label>
+                            <input
+                                name="email"
+                                value={form.email}
+                                onChange={handleChange}
+                                type="text"
+                                placeholder="Correo electrónico"
+                                style={{
+                                    borderColor: fieldErrors.email ? 'red' : '#FFA726',
+                                    borderRadius: '8px',
+                                    borderWidth: '1px',
+                                    padding: '0.5rem',
+                                    color: '#000',
+                                    width: '100%',
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ fontWeight: 'bold', color: fieldErrors.dni ? 'red' : '#000' }}>DNI</label>
+                            <input
+                                name="dni"
+                                value={form.dni}
+                                onChange={handleChange}
+                                type="text"
+                                placeholder="DNI"
+                                style={{
+                                    borderColor: fieldErrors.dni ? 'red' : '#FFA726',
+                                    borderRadius: '8px',
+                                    borderWidth: '1px',
+                                    padding: '0.5rem',
+                                    color: '#000',
+                                    width: '100%',
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div>
+                            <label style={{ fontWeight: 'bold', color: fieldErrors.apellido ? 'red' : '#000' }}>Apellido</label>
+                            <input
+                                name="apellido"
+                                value={form.apellido}
+                                onChange={handleChange}
+                                type="text"
+                                placeholder="Apellido"
+                                style={{
+                                    borderColor: fieldErrors.apellido ? 'red' : '#FFA726',
+                                    borderRadius: '8px',
+                                    borderWidth: '1px',
+                                    padding: '0.5rem',
+                                    color: '#000',
+                                    width: '100%',
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ fontWeight: 'bold', color: fieldErrors.password ? 'red' : '#000' }}>Contraseña</label>
+                            <input
+                                name="password"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Contraseña"
+                                value={form.password}
+                                onChange={handleChange}
+                                style={{
+                                    borderColor: fieldErrors.password ? 'red' : '#FFA726',
+                                    borderRadius: '8px',
+                                    borderWidth: '1px',
+                                    padding: '0.5rem',
+                                    color: '#000',
+                                    width: '100%',
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ fontWeight: 'bold', color: fieldErrors.fecha_nacimiento ? 'red' : '#000' }}>Fecha de nacimiento</label>
+                            <input
+                                name="fecha_nacimiento"
+                                value={form.fecha_nacimiento}
+                                onChange={handleChange}
+                                type="date"
+                                placeholder="Fecha de nacimiento"
+                                style={{
+                                    borderColor: fieldErrors.fecha_nacimiento ? 'red' : '#FFA726',
+                                    borderRadius: '8px',
+                                    borderWidth: '1px',
+                                    padding: '0.5rem',
+                                    color: '#000',
+                                    width: '100%',
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label style={{ fontWeight: 'bold', color: fieldErrors.sexo ? 'red' : '#000' }}>Sexo</label>
+                    <select
+                        name="sexo"
+                        value={form.sexo}
                         onChange={handleChange}
                         style={{
-                            borderColor: fieldErrors.password ? 'red' : undefined,
+                            borderColor: fieldErrors.sexo ? 'red' : '#FFA726',
                             borderRadius: '8px',
                             borderWidth: '1px',
                             padding: '0.5rem',
-                            fontSize: '1rem',
+                            color: '#000',
                             width: '100%',
                         }}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        style={{
-                            position: 'absolute',
-                            right: '0.5rem',
-                            top: '70%',
-                            transform: 'translateY(-50%)',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '0.9rem',
-                            color: '#007BFF',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            height: '100%',
-                        }}
                     >
-                        {showPassword ? 'Ocultar' : 'Mostrar'}
-                    </button>
+                        <option value="">Sexo</option>
+                        <option value="male">Masculino</option>
+                        <option value="female">Femenino</option>
+                        <option value="other">Otro</option>
+                    </select>
                 </div>
-                {fieldErrors.password && <p style={{ color: 'red' }}>{fieldErrors.password}</p>}
-
-                <label style={{ fontWeight: 'bold', color: fieldErrors.dni ? 'red' : undefined }}>DNI</label>
-                <input
-                    name="dni"
-                    value={form.dni}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="DNI"
-                    style={{
-                        borderColor: fieldErrors.dni ? 'red' : undefined,
-                        borderRadius: '8px',
-                        borderWidth: '1px',
-                        padding: '0.5rem',
-                    }}
-                />
-                {fieldErrors.dni && <p style={{ color: 'red' }}>{fieldErrors.dni}</p>}
-
-                <label style={{ fontWeight: 'bold', color: fieldErrors.sexo ? 'red' : undefined }}>Sexo</label>
-                <select
-                    name="sexo"
-                    value={form.sexo}
-                    onChange={handleChange}
-                    style={{
-                        borderColor: fieldErrors.sexo ? 'red' : undefined,
-                        borderRadius: '8px',
-                        borderWidth: '1px',
-                        padding: '0.5rem',
-                    }}
-                >
-                    <option value="">Sexo</option>
-                    <option value="male">Masculino</option>
-                    <option value="female">Femenino</option>
-                    <option value="other">Otro</option>
-                </select>
-                {fieldErrors.sexo && <p style={{ color: 'red' }}>{fieldErrors.sexo}</p>}
-
-                <label style={{ fontWeight: 'bold', color: fieldErrors.fecha_nacimiento ? 'red' : undefined }}>Fecha de nacimiento</label>
-                <input
-                    name="fecha_nacimiento"
-                    value={form.fecha_nacimiento}
-                    onChange={handleChange}
-                    type="date"
-                    placeholder="Fecha de nacimiento"
-                    style={{
-                        borderColor: fieldErrors.fecha_nacimiento ? 'red' : undefined,
-                        borderRadius: '8px',
-                        borderWidth: '1px',
-                        padding: '0.5rem',
-                    }}
-                />
-                {fieldErrors.fecha_nacimiento && <p style={{ color: 'red' }}>{fieldErrors.fecha_nacimiento}</p>}
-
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {success && <p style={{ color: 'green' }}>{success}</p>}
-
+                {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+                {success && <p style={{ color: 'green', textAlign: 'center' }}>{success}</p>}
                 <button
                     type="submit"
                     disabled={isSubmitting}
                     style={{
                         padding: '0.5rem',
                         fontSize: '1rem',
-                        backgroundColor: '#007BFF',
+                        backgroundColor: '#FFA726',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                        width: '100%',
                     }}
                 >
                     {isSubmitting ? 'Registrando...' : 'Registrarse'}
