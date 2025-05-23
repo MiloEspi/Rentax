@@ -62,7 +62,12 @@ class ViviendaSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_fields = ['fotos']
     def validate_titulo(self, value):
-        if Propiedad.objects.filter(titulo=value).exists():
+        request = self.context.get('request')
+        vivienda_id = self.instance.id if self.instance else None
+        qs = Propiedad.objects.filter(titulo=value)
+        if vivienda_id:
+            qs = qs.exclude(id=vivienda_id)
+        if qs.exists():
             raise serializers.ValidationError("Ya existe una propiedad con ese título.")
         return value
     def create(self, validated_data):
@@ -92,7 +97,12 @@ class LocalComercialSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_fields = ['fotos']
     def validate_titulo(self, value):
-        if Propiedad.objects.filter(titulo=value).exists():
+        request = self.context.get('request')
+        local_id = self.instance.id if self.instance else None
+        qs = Propiedad.objects.filter(titulo=value)
+        if local_id:
+            qs = qs.exclude(id=local_id)
+        if qs.exists():
             raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
         return value
     def create(self, validated_data):
@@ -112,7 +122,12 @@ class CocheraSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_fields = ['fotos']
     def validate_titulo(self, value):
-        if Propiedad.objects.filter(titulo=value).exists():
+        request = self.context.get('request')
+        cochera_id = self.instance.id if self.instance else None
+        qs = Propiedad.objects.filter(titulo=value)
+        if cochera_id:
+            qs = qs.exclude(id=cochera_id)
+        if qs.exists():
             raise serializers.ValidationError("Ya existe una propiedad con ese titulo.")
         return value
     def create(self, validated_data):
