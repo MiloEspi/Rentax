@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 
 const tipoMap: Record<string, string> = {
   viviendas: 'vivienda',
-  garajes: 'cochera',
+  garages: 'cochera',
   locales: 'local',
 };
 

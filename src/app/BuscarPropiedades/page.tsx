@@ -17,6 +17,8 @@ const TIPOS_PROPIEDAD = [
   { label: 'Cochera', value: 'cochera' },
 ];
 
+// Removed the misplaced useEffect
+
 const RENTAX_RED = '#ff5a1f';
 const RENTAX_LIGHT_RED = '#ffe7db';
 
@@ -281,8 +283,9 @@ function DateSelector({
 
 export default function BuscarPropiedades() {
   const [tipoPropiedad, setTipoPropiedad] = useState<'vivienda' | 'local' | 'cochera'>('vivienda');
-  const [ciudadInput, setCiudadInput] = useState('');
+  // Removed duplicate declaration of resultados
   const [ciudadFiltrada, setCiudadFiltrada] = useState<string[]>([]);
+  const [ciudadInput, setCiudadInput] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState('');
   const [precio, setPrecio] = useState<[number, number]>([0, 500]);
   const [metros, setMetros] = useState<[number, number]>([10, 500]);
@@ -293,9 +296,25 @@ export default function BuscarPropiedades() {
   const [serviciosSeleccionados, setServiciosSeleccionados] = useState<string[]>([]);
 
   // Huespedes, ambientes y baños
-  const [huespedes, setHuespedes] = useState(1);
+  useEffect(() => {
+    const fetchPropiedades = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/propiedades/');
+        if (!response.ok) {
+          throw new Error('Error al obtener las propiedades');
+        }
+        const data = await response.json();
+        setResultados(data);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchPropiedades();
+  }, []);
   const [ambientes, setAmbientes] = useState(1);
   const [banios, setBanios] = useState(1);
+  const [huespedes, setHuespedes] = useState(1);
 
   // Fechas
   const [fechaDesde, setFechaDesde] = useState<Date | null>(null);
@@ -394,63 +413,15 @@ export default function BuscarPropiedades() {
   //   { label: 'Local Comercial', value: 'local' },
   // ];
 
-  // Trae todas las propiedades al montar
-  useEffect(() => {
-    fetch('http://localhost:8000/viviendas/')
-      .then(res => res.json())
-      .then(data => setResultados(data))
-      .catch(() => setResultados([]));
-  }, []);
-
-  // Cambia el fetch para traer solo viviendas
-
-  // Filtro de ciudad (usa selectedCity si está, sino ciudadInput)
-  const ciudadFiltro = selectedCity || ciudadInput;
-
-  // Filtro principal
-  const resultadosFiltrados = resultados.filter(v => {
-    // Filtra por tipo de propiedad
-    if (v.tipo !== tipoPropiedad) return false;
-
-    // Filtros solo para vivienda
-    if (tipoPropiedad === 'vivienda') {
-      if (
-        (ciudadFiltro && !(v.localidad && v.localidad.nombre && v.localidad.nombre.toLowerCase().includes(ciudadFiltro.toLowerCase())))
-        || (serviciosSeleccionados.length > 0 && !serviciosSeleccionados.every(s => v.atributos?.includes(s)))
-        || (huespedes && (!v.huespedes || v.huespedes < huespedes))
-        || (ambientes && (!v.ambientes || v.ambientes < ambientes))
-        || (banios && (!v.banios || v.banios < banios))
-        || (v.precio < precio[0] || v.precio > precio[1])
-      ) {
-        return false;
-      }
-    }
-
-    // Filtros solo para local
-    if (tipoPropiedad === 'local') {
-      if (
-        (ciudadFiltro && !(v.localidad && v.localidad.nombre && v.localidad.nombre.toLowerCase().includes(ciudadFiltro.toLowerCase())))
-        || (v.metros && (v.metros < metros[0] || v.metros > metros[1]))
-        || (v.precio < precio[0] || v.precio > precio[1])
-      ) {
-        return false;
-      }
-    }
-
-    // Filtros solo para cochera
-    if (tipoPropiedad === 'cochera') {
-      if (
-        (ciudadFiltro && !(v.localidad && v.localidad.nombre && v.localidad.nombre.toLowerCase().includes(ciudadFiltro.toLowerCase())))
-        || (v.precio < precio[0] || v.precio > precio[1])
-      ) {
-        return false;
-      }
-    }
-
-    // Si pasa todos los filtros, mostrar
-    return true;
-  });
-
+  const handleBuscar = () => {
+    setShowResultados(true);
+    // Simulación de filtrado por tipoPropiedad
+    setResultados([
+      { id: 1, titulo: tipoPropiedad === 'vivienda' ? 'Casa' : tipoPropiedad === 'local' ? 'Local Comercial' : 'Cochera', ciudad: selectedCity, precio: 100, foto: '', tipo: tipoPropiedad },
+      { id: 2, titulo: tipoPropiedad === 'vivienda' ? 'Depto' : tipoPropiedad === 'local' ? 'Local Centro' : 'Cochera Cubierta', ciudad: selectedCity, precio: 200, foto: '', tipo: tipoPropiedad },
+      { id: 3, titulo: tipoPropiedad === 'vivienda' ? 'PH' : tipoPropiedad === 'local' ? 'Local Galería' : 'Cochera Descubierta', ciudad: selectedCity, precio: 300, foto: '', tipo: tipoPropiedad },
+    ]);
+  };
 
   const resetAll = () => {
     setSelectedCity('');
@@ -927,3 +898,4 @@ export default function BuscarPropiedades() {
     </div>
   );
 }
+

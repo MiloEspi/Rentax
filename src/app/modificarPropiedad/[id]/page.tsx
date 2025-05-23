@@ -18,6 +18,7 @@ type PropiedadBase = {
   departamento?: string | null;
   politica: PoliticaObj | null;
   localidad: number | null;
+  cantidadDiasMinimo?: number | null;
   // ...otros campos comunes...
 };
 
@@ -25,7 +26,6 @@ type PropiedadVivienda = PropiedadBase & {
   ambientes: number;
   huespedes?: number | null;
   banios?: number | null;
-  cantidadDiasMinimo?: number | null;
   atributos?: string[];
 };
 
@@ -168,7 +168,7 @@ export default function ModificarPropiedad({ params }: { params: { id: string } 
     formData.append('piso', propiedad.piso?.toString() ?? '');
     formData.append('departamento', propiedad.departamento ?? '');
     // Solo el id de la política (ahora siempre es number o null)
-    formData.append('politica_id', propiedad.politica?.id?.toString() ?? '');
+    formData.append('politica', propiedad.politica?.id?.toString() ?? '');
     formData.append('localidad', propiedad.localidad?.toString() ?? '');
     formData.append('tipoPropiedad', propiedad.tipoPropiedad);
 

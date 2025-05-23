@@ -37,7 +37,7 @@ export default function Login() {
                 localStorage.setItem('adminEmail', email);
                 window.location.href = '/verificacionAdmin';
             } else {
-                setError(data.error || 'Credenciales incorrectas');
+                setError(data.error || 'Ocurrió un error. Por favor, intenta nuevamente.');
             }
         }
         catch (err: unknown) {
