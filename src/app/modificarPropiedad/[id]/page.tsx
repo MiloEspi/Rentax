@@ -157,6 +157,13 @@ export default function ModificarPropiedad({ params }: { params: { id: string } 
     e.preventDefault();
     if (!propiedad) return;
 
+    // Validación: no permitir guardar si solo hay una foto cargada
+    const totalFotos = propiedad.fotos.length + nuevasFotos.length;
+    if (totalFotos <= 0) {
+      setMensaje('Debe haber al menos una foto cargada');
+      return;
+    }
+
     setMensaje('Cambiando...');
 
     const formData = new FormData();

@@ -24,7 +24,8 @@ urlpatterns = [
     path('', include('propiedades.urls')),
     path('',include('usuarios.urls')),
     path('', include('accounts.urls')),  # Asegurate de importar las rutas de la app
-
+    path('', include('alquileres.urls')),  # Asegurate de importar las rutas de la app
+    
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

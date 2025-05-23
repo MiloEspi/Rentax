@@ -7,6 +7,5 @@ class Alquiler(models.Model):
     fechaInicio=models.DateField()
     fechaFin=models.DateField()
     precio=models.DecimalField(max_digits=10, decimal_places=2)
-    cantidadDias=models.IntegerField()
     inquilino=models.ForeignKey(Usuario,on_delete=models.CASCADE)
     perteneceAPropiedad=models.ForeignKey(Propiedad,on_delete=models.CASCADE,null=True)
