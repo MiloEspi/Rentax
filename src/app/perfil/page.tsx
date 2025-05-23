@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 
 const generos = [
     { value: '', label: 'Seleccionar' },
@@ -21,6 +22,7 @@ const esMayorDeEdad = (fecha: string) => {
 };
 
 const PerfilPage = () => {
+    const router = useRouter(); // Hook para obtener la ruta actual
     const [email, setEmail] = useState('');
     const [user, setUser] = useState({
         nombre: '',
@@ -35,7 +37,7 @@ const PerfilPage = () => {
 
     const [editando, setEditando] = useState(false);
     const [password, setPassword] = useState('');
-    const [errores, setErrores] = useState({ password: '', fechaNacimiento: '', nombre: '' });
+    const [errores, setErrores] = useState({ password: '', fechaNacimiento: '', nombre: '', apellido: '' });
     const [successMsg, setSuccessMsg] = useState('');
 
     const [loading, setLoading] = useState(true);
@@ -101,7 +103,7 @@ const PerfilPage = () => {
         setUser(originalUser);
         setEditando(false);
         setPassword('');
-        setErrores({ password: '', fechaNacimiento: '', nombre: '' });
+        setErrores({ password: '', fechaNacimiento: '', nombre: '', apellido: '' });
     };
 
     const handleSave = (e: React.FormEvent) => {
@@ -110,12 +112,18 @@ const PerfilPage = () => {
         let passwordError = '';
         let fechaNacimientoError = '';
         let nombreError = '';
+        let apellidoError = '';
 
         // Validar el campo 'nombre'
         if (!user.nombre.trim()) {
             nombreError = "El campo 'nombre' es obligatorio.";
             valid = false;
         }
+        // Validar el campo 'apellido'
+    if (!user.apellido.trim()) {
+        apellidoError = "El campo 'apellido' es obligatorio.";
+        valid = false;
+    }
 
         // Validar la contraseña
         if (password && password.length < 8) {
@@ -130,7 +138,7 @@ const PerfilPage = () => {
         }
 
         // Actualizar los errores
-        setErrores({ password: passwordError, fechaNacimiento: fechaNacimientoError, nombre: nombreError });
+        setErrores({ password: passwordError, fechaNacimiento: fechaNacimientoError, nombre: nombreError,apellido: apellidoError, });
 
         if (!valid) return;
 
@@ -188,7 +196,7 @@ const PerfilPage = () => {
                     fontSize: 32,
                     fontWeight: 700,
                     marginBottom: 24,
-                    color: '#4f46e5',
+                    color: '#f59e0b', // Cambiado a un color anaranjado amarillento
                     letterSpacing: 1,
                 }}>
                     Mi Perfil
@@ -211,7 +219,7 @@ const PerfilPage = () => {
                 <form onSubmit={handleSave} style={{ width: '100%' }}>
                     <div style={{ display: 'flex', gap: 24, marginBottom: 20 }}>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontWeight: 600, color: '#6366f1' }}>Nombre</label>
+                            <label style={{ fontWeight: 600, color: '#f59e0b' }}>Nombre</label> {/* Cambiado a anaranjado amarillento */}
                             <input
                                 type="text"
                                 name="nombre"
@@ -234,7 +242,7 @@ const PerfilPage = () => {
                             )}
                         </div>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontWeight: 600, color: '#6366f1' }}>Apellido</label>
+                            <label style={{ fontWeight: 600, color: '#f59e0b' }}>Apellido</label> {/* Cambiado a anaranjado amarillento */}
                             <input
                                 type="text"
                                 name="apellido"
@@ -252,10 +260,13 @@ const PerfilPage = () => {
                                     color: 'black'
                                 }}
                             />
+                            {errores.apellido && (
+                                <div style={{ color: 'red', fontSize: 13, marginTop: 4 }}>{errores.apellido}</div>
+                            )}
                         </div>
                     </div>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ fontWeight: 600, color: '#6366f1' }}>DNI</label>
+                        <label style={{ fontWeight: 600, color: '#f59e0b' }}>DNI</label> {/* Cambiado a anaranjado amarillento */}
                         <input
                             type="text"
                             value={user.dni}
@@ -272,7 +283,7 @@ const PerfilPage = () => {
                         />
                     </div>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ fontWeight: 600, color: '#6366f1' }}>Email</label>
+                        <label style={{ fontWeight: 600, color: '#f59e0b' }}>Email</label> {/* Cambiado a anaranjado amarillento */}
                         <input
                             type="email"
                             value={user.email}
@@ -290,7 +301,7 @@ const PerfilPage = () => {
                     </div>
                     <div style={{ display: 'flex', gap: 24, marginBottom: 20 }}>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontWeight: 600, color: '#6366f1' }}>Fecha de nacimiento</label>
+                            <label style={{ fontWeight: 600, color: '#f59e0b' }}>Fecha de nacimiento</label> {/* Cambiado a anaranjado amarillento */}
                             <input
                                 type="date"
                                 name="fechaNacimiento"
@@ -313,7 +324,7 @@ const PerfilPage = () => {
                             )}
                         </div>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontWeight: 600, color: '#6366f1' }}>Género</label>
+                            <label style={{ fontWeight: 600, color: '#f59e0b' }}>Género</label> {/* Cambiado a anaranjado amarillento */}
                             <select
                                 name="genero"
                                 value={user.genero}
@@ -337,7 +348,7 @@ const PerfilPage = () => {
                         </div>
                     </div>
                     <div style={{ marginBottom: 28 }}>
-                        <label style={{ fontWeight: 600, color: '#6366f1' }}>Contraseña</label>
+                        <label style={{ fontWeight: 600, color: '#f59e0b' }}>Contraseña</label> {/* Cambiado a anaranjado amarillento */}
                         <input
                             type="password"
                             name="password"
@@ -384,7 +395,7 @@ const PerfilPage = () => {
                                     style={{
                                         padding: '10px 32px',
                                         background: '#f3f4f6',
-                                        color: '#6366f1',
+                                        color: '#f59e0b', // Cambiado a anaranjado amarillento
                                         border: '1px solid #c7d2fe',
                                         borderRadius: 8,
                                         fontWeight: 600,
@@ -406,48 +417,48 @@ const PerfilPage = () => {
                             onClick={handleEdit}
                             style={{
                                 padding: '10px 32px',
-                                background: '#6366f1',
+                                background: '#f59e0b', // Cambiado a anaranjado amarillento
                                 color: '#fff',
                                 border: 'none',
                                 borderRadius: 8,
                                 fontWeight: 600,
                                 fontSize: 16,
                                 cursor: 'pointer',
-                                boxShadow: '0 2px 8px #c7d2fe',
+                                boxShadow: '0 2px 8px #fcd34d',
                             }}
                         >
                             Editar
                         </button>
                     </div>
-                )}
-                {/* Botón "Ver mis alquileres" */}
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32 }}>
-                    <button
-                        type="button"
-                        onClick={() => window.location.href = '/misAlquileres'}
-                        style={{
-                            padding: '12px 36px',
-                            background: '#22d3ee',
-                            color: '#0f172a',
-                            border: 'none',
-                            borderRadius: 8,
-                            fontWeight: 700,
-                            fontSize: 18,
-                            cursor: 'pointer',
-                            boxShadow: '0 2px 8px #bae6fd',
-                            letterSpacing: 1,
-                            transition: 'background 0.2s',
-                        }}
-                        onMouseOver={e => (e.currentTarget.style.background = '#06b6d4')}
-                        onMouseOut={e => (e.currentTarget.style.background = '#22d3ee')}
-                    >
-                        Ver mis alquileres
-                    </button>
+                    
+                    )}
+                    {/* Botón "Ver mis alquileres" */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32 }}>
+                        <button
+                            type="button"
+                            onClick={() => window.location.href = '/misAlquileres'}
+                            style={{
+                                padding: '12px 36px',
+                                background: '#f59e0b', // Cambiado a anaranjado amarillento
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 8,
+                                fontWeight: 700,
+                                fontSize: 18,
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 8px #fcd34d',
+                                letterSpacing: 1,
+                                transition: 'background 0.2s',
+                            }}
+                            onMouseOver={e => (e.currentTarget.style.background = '#d97706')}
+                            onMouseOut={e => (e.currentTarget.style.background = '#f59e0b')}
+                        >
+                            Mis alquileres
+                        </button>
+                    </div>
+    
                 </div>
-
             </div>
-        </div>
-    );
-};
-
-export default PerfilPage;
+        );
+    };
+    export default PerfilPage;

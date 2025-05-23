@@ -3,11 +3,12 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
-// Orden: Vivienda, Local, Cochera
+// Orden: Vivienda, Garage, Local
 const propertyTypes = [
-    { label: 'Vivienda', value: 'vivienda' },
-    { label: 'Local', value: 'local' },
-    { label: 'Cochera', value: 'cochera' },
+    { label: 'Viviendas', value: 'Viviendas' },
+    { label: 'Garajes', value: 'Garajes' },
+    { label: 'Locales Comerciales', value: 'Locales Comerciales' },
+   
 ];
 
 const PropertySelector: React.FC = () => {

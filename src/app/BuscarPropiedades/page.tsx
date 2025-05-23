@@ -17,6 +17,8 @@ const TIPOS_PROPIEDAD = [
   { label: 'Cochera', value: 'cochera' },
 ];
 
+// Removed the misplaced useEffect
+
 // Colores para el calendario
 const RENTAX_RED = '#ff5a1f';
 const RENTAX_LIGHT_RED = '#ffe7db';
@@ -282,8 +284,9 @@ function DateSelector({
 
 export default function BuscarPropiedades() {
   const [tipoPropiedad, setTipoPropiedad] = useState<'vivienda' | 'local' | 'cochera'>('vivienda');
-  const [ciudadInput, setCiudadInput] = useState('');
+  // Removed duplicate declaration of resultados
   const [ciudadFiltrada, setCiudadFiltrada] = useState<string[]>([]);
+  const [ciudadInput, setCiudadInput] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState('');
   const [precio, setPrecio] = useState<[number, number]>([30, 500]);
   const [metros, setMetros] = useState<[number, number]>([10, 500]);
@@ -294,9 +297,25 @@ export default function BuscarPropiedades() {
   const [serviciosSeleccionados, setServiciosSeleccionados] = useState<string[]>([]);
 
   // Huespedes, ambientes y baños
-  const [huespedes, setHuespedes] = useState(1);
+  useEffect(() => {
+    const fetchPropiedades = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/propiedades/');
+        if (!response.ok) {
+          throw new Error('Error al obtener las propiedades');
+        }
+        const data = await response.json();
+        setResultados(data);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchPropiedades();
+  }, []);
   const [ambientes, setAmbientes] = useState(1);
   const [banios, setBanios] = useState(1);
+  const [huespedes, setHuespedes] = useState(1);
 
   // Fechas
   const [fechaDesde, setFechaDesde] = useState<Date | null>(null);
@@ -383,14 +402,56 @@ export default function BuscarPropiedades() {
   //   { label: 'Local Comercial', value: 'local' },
   // ];
 
-  const handleBuscar = () => {
-    setShowResultados(true);
-    // Simulación de filtrado por tipoPropiedad
-    setResultados([
-      { id: 1, titulo: tipoPropiedad === 'vivienda' ? 'Casa' : tipoPropiedad === 'local' ? 'Local Comercial' : 'Cochera', ciudad: selectedCity, precio: 100, foto: '', tipo: tipoPropiedad },
-      { id: 2, titulo: tipoPropiedad === 'vivienda' ? 'Depto' : tipoPropiedad === 'local' ? 'Local Centro' : 'Cochera Cubierta', ciudad: selectedCity, precio: 200, foto: '', tipo: tipoPropiedad },
-      { id: 3, titulo: tipoPropiedad === 'vivienda' ? 'PH' : tipoPropiedad === 'local' ? 'Local Galería' : 'Cochera Descubierta', ciudad: selectedCity, precio: 300, foto: '', tipo: tipoPropiedad },
-    ]);
+  const handleBuscar = async () => {
+    try {
+      // Realiza una solicitud a la API para obtener las propiedades según la categoría seleccionada
+      const response = await fetch(`http://localhost:8000/api/propiedades/?tipo=${tipoPropiedad}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener las propiedades');
+      }
+      const data = await response.json();
+
+      // Filtra las propiedades en el frontend según los filtros seleccionados
+      const propiedadesFiltradas = data.filter((propiedad: any) => {
+        // Filtrar por ciudad
+        if (selectedCity && propiedad.localidad?.nombre !== selectedCity) {
+          return false;
+        }
+
+        // Filtrar por rango de precios
+        if (propiedad.precio < precio[0] || propiedad.precio > precio[1]) {
+          return false;
+        }
+
+        // Filtrar por metros cuadrados (solo para locales comerciales)
+        if (tipoPropiedad === 'local' && (propiedad.metros_cuadrados < metros[0] || propiedad.metros_cuadrados > metros[1])) {
+          return false;
+        }
+
+        // Filtrar por servicios (solo para viviendas)
+        if (tipoPropiedad === 'vivienda' && serviciosSeleccionados.length > 0) {
+          const atributos = propiedad.atributos || [];
+          if (!serviciosSeleccionados.every((servicio) => atributos.includes(servicio))) {
+            return false;
+          }
+        }
+
+        // Filtrar por capacidad (solo para viviendas)
+        if (tipoPropiedad === 'vivienda') {
+          if (propiedad.huespedes < huespedes || propiedad.ambientes < ambientes || propiedad.banios < banios) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      // Actualiza los resultados filtrados
+      setResultados(propiedadesFiltradas);
+      setShowResultados(true);
+    } catch (error) {
+      console.error('Error al buscar propiedades:', error);
+    }
   };
 
   const resetAll = () => {
@@ -862,3 +923,4 @@ export default function BuscarPropiedades() {
     </div>
   );
 }
+

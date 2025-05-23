@@ -145,8 +145,11 @@ class LocalidadListView(APIView):
 
 class PropiedadListCreateView(APIView):
     def get(self, request):
+        tipo = request.query_params.get('tipo', None)
         propiedades = Propiedad.objects.all()
-        serializer = PropiedadSerializer(propiedades, many=True, context={'request': request})  # <--- agrega context
+        if tipo:
+            propiedades = propiedades.filter(tipoPropiedad=tipo)
+        serializer = PropiedadSerializer(propiedades, many=True, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request):
